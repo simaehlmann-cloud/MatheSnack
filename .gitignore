@@ -1,0 +1,18 @@
+# Prüfwerkzeuge, werden bei Bedarf mit "npm install" geholt
+node_modules/
+package-lock.json
+test-results/
+smoketest-shots/
+
+# Signierschlüssel gehören nie ins Repo
+*.p12
+*.p8
+*.keystore
+*.jks
+*.mobileprovision
+ios-signierung/
+
+# Cordova-Bauordner aus den Workflows
+build/
+
+.DS_Store
