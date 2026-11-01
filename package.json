@@ -1,0 +1,14 @@
+{
+  "name": "mathesnack",
+  "private": true,
+  "description": "Prüfwerkzeuge für MatheSnack. Die App selbst braucht keine Pakete und keinen Build-Schritt.",
+  "scripts": {
+    "validate": "node validate.js",
+    "test": "node smoketest.js",
+    "start": "python3 -m http.server 8765"
+  },
+  "devDependencies": {
+    "jsqr": "1.4.0",
+    "playwright": "1.63.0"
+  }
+}

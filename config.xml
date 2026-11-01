@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- Paketkennung: nach der ersten Veröffentlichung unveränderlich.
+     Vor dem Anlegen in App Store Connect bzw. der Play Console bewusst festlegen.
+     Aufbau wie bei Drawmory. -->
+<widget id="de.mathesnack.app"
+        version="0.1.0"
+        android-versionCode="100"
+        ios-CFBundleVersion="100"
+        xmlns="http://www.w3.org/ns/widgets"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0">
+
+    <name>MatheSnack</name>
+    <description>Kurze Mathe-Spiele zum Stundenbeginn: Die Lehrkraft zeigt einen QR-Code, die Klasse spielt sofort. Kopfrechen-Sprint, Fehlersuche, Memory, Domino, Bingo, Schiffe versenken, Stationen-Rallye und Bewegungspausen. Ohne Konto, ohne Server, ohne Tracking.</description>
+    <author email="smaehlmann.appdev@gmail.com">Wisdompeak Apps – Simon Mählmann</author>
+
+    <content src="index.html" />
+
+    <!-- Kein <access origin="*">: Die App lädt keine fremden Inhalte.
+         Externe Links (Datenschutz von GitHub) gehen an den Browser. -->
+    <allow-intent href="mailto:*" />
+    <allow-intent href="https://*/*" />
+
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="Fullscreen" value="false" />
+    <!-- Hochkant auf dem Handy, quer am Beamer-Tablet -->
+    <preference name="Orientation" value="default" />
+    <preference name="BackgroundColor" value="0xfffbf7ef" />
+
+    <platform name="ios">
+        <preference name="deployment-target" value="15.0" />
+        <preference name="AllowBackForwardNavigationGestures" value="true" />
+        <preference name="StatusBarOverlaysWebView" value="true" />
+        <preference name="StatusBarStyle" value="default" />
+        <!-- Kamerabild im Scanner direkt auf der Seite statt im Vollbild-Player -->
+        <preference name="AllowInlineMediaPlayback" value="true" />
+        <preference name="MediaTypesRequiringUserActionForPlayback" value="none" />
+
+        <edit-config target="ITSAppUsesNonExemptEncryption" file="*-Info.plist" mode="overwrite">
+            <false/>
+        </edit-config>
+        <!-- Pflicht, sobald die Kamera genutzt wird – sonst beendet iOS die App
+             beim ersten Scan. Text erscheint im Erlaubnis-Dialog. -->
+        <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="overwrite">
+            <string>MatheSnack nutzt die Kamera nur, um den QR-Code eines Spiels zu lesen. Das Bild wird auf dem Gerät ausgewertet und weder gespeichert noch übertragen.</string>
+        </edit-config>
+
+        <icon src="res/ios/icon-20.png"   width="20"   height="20" />
+        <icon src="res/ios/icon-29.png"   width="29"   height="29" />
+        <icon src="res/ios/icon-40.png"   width="40"   height="40" />
+        <icon src="res/ios/icon-58.png"   width="58"   height="58" />
+        <icon src="res/ios/icon-60.png"   width="60"   height="60" />
+        <icon src="res/ios/icon-76.png"   width="76"   height="76" />
+        <icon src="res/ios/icon-80.png"   width="80"   height="80" />
+        <icon src="res/ios/icon-87.png"   width="87"   height="87" />
+        <icon src="res/ios/icon-120.png"  width="120"  height="120" />
+        <icon src="res/ios/icon-152.png"  width="152"  height="152" />
+        <icon src="res/ios/icon-167.png"  width="167"  height="167" />
+        <icon src="res/ios/icon-180.png"  width="180"  height="180" />
+        <icon src="res/ios/icon-1024.png" width="1024" height="1024" />
+        <splash src="res/ios/Default@2x~universal~anyany.png" />
+    </platform>
+
+    <platform name="android">
+        <preference name="android-minSdkVersion"     value="24" />
+        <preference name="android-targetSdkVersion"  value="36" />
+        <preference name="android-compileSdkVersion" value="36" />
+        <preference name="AndroidXEnabled" value="true" />
+        <preference name="AndroidWindowSplashScreenBackground" value="#FBF7EF" />
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/android/icon_fg_xxxhdpi.png" />
+
+        <!-- Kamera für den QR-Scanner. required="false": Geräte ohne Kamera
+             (manche Tablets) können die App trotzdem installieren und den
+             Code eintippen. Die Erlaubnis fragt die App erst beim Scannen
+             (cordova-plugin-android-permissions). -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-feature android:name="android.hardware.camera" android:required="false" />
+            <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+        </config-file>
+
+        <resource-file src="res/android/colors.xml" target="/app/src/main/res/values/mathesnack_colors.xml" />
+
+        <icon density="ldpi"    background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_ldpi.png"    src="res/android/icon_ldpi.png" />
+        <icon density="mdpi"    background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_mdpi.png"    src="res/android/icon_mdpi.png" />
+        <icon density="hdpi"    background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_hdpi.png"    src="res/android/icon_hdpi.png" />
+        <icon density="xhdpi"   background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_xhdpi.png"   src="res/android/icon_xhdpi.png" />
+        <icon density="xxhdpi"  background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_xxhdpi.png"  src="res/android/icon_xxhdpi.png" />
+        <icon density="xxxhdpi" background="@color/mathesnack_icon_background" foreground="res/android/icon_fg_xxxhdpi.png" src="res/android/icon_xxxhdpi.png" />
+    </platform>
+
+    <plugin name="cordova-plugin-statusbar" spec="^4.0.0" />
+    <!-- Laufzeit-Erlaubnis für die Kamera unter Android (getUserMedia im
+         WebView braucht sie; unter iOS fragt das System selbst). -->
+    <plugin name="cordova-plugin-android-permissions" spec="^1.1.5" />
+</widget>

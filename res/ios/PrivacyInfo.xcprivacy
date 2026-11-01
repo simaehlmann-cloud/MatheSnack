@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Privacy-Manifest für MatheSnack (Muster: Drawmory).
+
+  Apple verlangt diese Datei. Fehlt sie oder ist sie leer, weist App Store
+  Connect den Upload zurück – erst nach der Verarbeitung, die Build-Nummer
+  ist dann verbraucht.
+
+  Der Inhalt bildet das Verhalten der App ab: MatheSnack erhebt nichts,
+  sendet nichts und trackt nicht. Die Kamera dient nur dem QR-Scan auf dem
+  Gerät (NSCameraUsageDescription in der config.xml); das ist keine
+  Required-Reason-API.
+
+  Einziger meldepflichtiger Zugriff: UserDefaults. Cordova legt dort eigene
+  Einstellungen ab. Grund CA92.1 = nur Daten des eigenen App-Containers.
+-->
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <!-- Leer und bewusst so: Die App sammelt keine Daten. -->
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
