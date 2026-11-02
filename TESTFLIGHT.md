@@ -70,11 +70,12 @@ App Store Connect → MatheSnack → **Monetarisierung → In-App-Käufe** → *
 - Preis: **4,99 €**, Verfügbarkeit: alle Länder
 - **Familienfreigabe**: einschalten (die App wirbt damit)
 - Lokalisierung Deutsch: Anzeigename `Lehrkraft-Paket`,
-  Beschreibung `Alle Spiele für die ganze Klasse: Domino, Bingo, Schiffe, Rallye u. a.`
-- Lokalisierung Englisch: `Teacher Pack`,
-  `Every game for the whole class: dominoes, bingo, battleships, rally and more`
+  Beschreibung `Alle Spiele für die ganze Klasse freischalten` (Apple erlaubt
+  höchstens 30 bzw. 45 Zeichen)
+- Lokalisierung Englisch (USA und UK): `Teacher Pack`,
+  `Unlock every game for the whole class`
 - Prüfungsinformationen: Bildschirmfoto des Paket-Bildschirms
-  (Einstellungen → „Lehrkraft-Paket ansehen“) und als Notiz der Text aus
+  (Einstellungen → „Lehrkraft-Paket ansehen“, 1290 × 2796) und als Notiz der Text aus
   [Prüfungsanmerkungen](#prüfungsanmerkungen-für-apple).
 
 Ziel: Status **„Bereit zur Einreichung“**. Steht dort „Fehlende Metadaten“,
