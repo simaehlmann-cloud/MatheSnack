@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MatheSnack – Mathe-Spiele zum Stundenbeginn</title>
+<meta name="description" content="Kurze Mathe-Spiele zum Stundenbeginn: Die Lehrkraft zeigt einen QR-Code, die Klasse spielt sofort. Ohne Konto, ohne Server, ohne Tracking.">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root { --paper:#FBF7EF; --grid:#EFE7D8; --card:#fff; --text:#1E2447; --muted:#636A8A; --ink:#2B3A9E; --line:#E3DACA; --accent:#FF6B2C; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; } }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:calc(24px + env(safe-area-inset-top)) 16px 40px; background-color:var(--paper); color:var(--text);
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size:26px 26px;
+    font:17px/1.55 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:720px; margin:0 auto; background:var(--card); border:2px solid var(--line); border-radius:24px; padding:28px 24px; }
+  header { text-align:center; }
+  header img { width:96px; height:96px; border-radius:22px; }
+  h1 { margin:10px 0 4px; font-size:clamp(30px,6vw,40px); }
+  .lead { color:var(--muted); margin:0 0 18px; }
+  ul { padding-left:20px; }
+  li { margin:4px 0; }
+  .lang { text-align:right; font-size:14px; }
+  a { color:var(--ink); }
+  .foot { margin-top:26px; font-size:14px; color:var(--muted); text-align:center; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<main>
+  <p class="lang"><a href="#" id="switch"></a></p>
+  <div data-lang="de">
+    <header>
+      <img src="icon-192.png" alt="">
+      <h1>MatheSnack</h1>
+      <p class="lead">Kurze Mathe-Spiele zum Stundenbeginn – per QR-Code.</p>
+    </header>
+    <p>Die Lehrkraft wählt Spiel und Thema und zeigt einen QR-Code am Beamer. Die Klasse scannt ihn mit der App und spielt sofort – als Konzentrationsstarter, zur Wiederholung oder als Bewegungspause mit Mathe.</p>
+    <ul>
+      <li>Kopfrechen-Sprint, Fehlersuche, Memory, Domino, Zuordnen</li>
+      <li>Kopfrechen-Bingo mit Spielleitung am Beamer</li>
+      <li>Schiffe versenken im Koordinatensystem</li>
+      <li>Stationen-Rallye mit QR-Karten im Raum</li>
+      <li>Move &amp; Brain: Bewegung mit Mathe</li>
+      <li>Von Einmaleins bis quadratische Funktionen, Klasse 5–10</li>
+    </ul>
+    <p><strong>Datenschutz:</strong> keine Konten, keine Namen, kein Server, kein Tracking. Alles bleibt auf dem Gerät.</p>
+    <p>MatheSnack erscheint bald im App Store und bei Google Play – für Schülerinnen und Schüler kostenlos.</p>
+    <p class="foot"><a href="datenschutz.html">Datenschutz</a> · <a href="impressum.html">Impressum</a> · Wisdompeak Apps – Simon Mählmann</p>
+  </div>
+  <div data-lang="en" hidden>
+    <header>
+      <img src="icon-192.png" alt="">
+      <h1>MatheSnack</h1>
+      <p class="lead">Quick maths games to start the lesson – via QR code.</p>
+    </header>
+    <p>The teacher picks a game and a topic and shows a QR code on the projector. The class scans it with the app and plays straight away – to get focused, to revise, or as a movement break with maths.</p>
+    <ul>
+      <li>Mental Maths Sprint, Spot the Mistake, Memory, Dominoes, Match Up</li>
+      <li>Mental Maths Bingo with a game host on the projector</li>
+      <li>Battleships on a coordinate grid</li>
+      <li>Station Rally with QR cards around the room</li>
+      <li>Move &amp; Brain: movement with maths</li>
+      <li>From times tables to quadratic functions, grades 5–10</li>
+    </ul>
+    <p><strong>Privacy:</strong> no accounts, no names, no server, no tracking. Everything stays on the device.</p>
+    <p>MatheSnack is coming soon to the App Store and Google Play – free for students.</p>
+    <p class="foot"><a href="datenschutz-en.html">Privacy</a> · <a href="impressum-en.html">Legal notice</a> · Wisdompeak Apps – Simon Mählmann</p>
+  </div>
+</main>
+<script>
+"use strict";
+let lang = (navigator.language || "de").toLowerCase().startsWith("de") ? "de" : "en";
+function show() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-lang]").forEach(el => { el.hidden = el.dataset.lang !== lang; });
+  document.getElementById("switch").textContent = lang === "de" ? "English" : "Deutsch";
+}
+document.getElementById("switch").addEventListener("click", e => { e.preventDefault(); lang = lang === "de" ? "en" : "de"; show(); });
+show();
+</script>
+</body>
+</html>

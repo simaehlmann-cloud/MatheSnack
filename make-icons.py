@@ -86,16 +86,14 @@ def art(size, pad=0.0, transparent=False):
 def save(im, *parts):
     path = os.path.join(HERE, *parts)
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    if parts[0] == "res" and parts[1] == "ios":
+    if parts[0] == "res" and parts[1] == "ios":  # iOS: ohne Alphakanal
         im = im.convert("RGB")
     im.save(path, optimize=True)
 
 
-save(art(1024, 0.04).convert("RGB"), "icon-1024.png")
-save(art(512, 0.04), "icon.png")
-save(art(192, 0.04), "icon-192.png")
-save(art(180, 0.04), "icon-180.png")
-save(art(512, 0.16), "icon-maskable-512.png")
+# App (Startseite) und Pages-Seiten
+save(art(192, 0.04), "www", "icon-192.png")
+save(art(192, 0.04), "docs", "icon-192.png")
 for s in (20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 1024):
     save(art(s, 0.04), "res", "ios", f"icon-{s}.png")
 

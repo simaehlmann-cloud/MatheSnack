@@ -1,38 +1,42 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Kurze Mathe-Spiele zum Stundenbeginn: Lehrkraft zeigt einen QR-Code, die Klasse spielt sofort. Ohne Anmeldung, ohne Server, ohne Tracking.">
-<meta name="theme-color" content="#FBF7EF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#14182B" media="(prefers-color-scheme: dark)">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: gap: content:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: content:; connect-src 'self' blob: data:; media-src 'self' blob: mediastream:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="color-scheme" content="light dark">
 <meta name="format-detection" content="telephone=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="MatheSnack">
 <title>MatheSnack</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
   --paper:#FBF7EF; --grid:#EFE7D8; --card:#FFFFFF; --card2:#FFF9F0; --text:#1E2447; --muted:#636A8A; --line:#E3DACA;
-  --ink:#2B3A9E; --ink-soft:#E6E9FB; --accent:#FF6B2C; --accent-soft:#FFE7DA;
+  --ink:#2B3A9E; --ink-soft:#E6E9FB; --on-ink:#FFFFFF; --graph-grid:#E6E1D6; --beam:1; --accent:#FF6B2C; --accent-soft:#FFE7DA;
   --good:#16955F; --good-soft:#DDF5EA; --bad:#D6304F; --bad-soft:#FCE1E6; --warn:#C77700; --warn-soft:#FFF0D4;
   --q:#E7ECFF; --q-line:#9EAEF5; --a:#FFE9DA; --a-line:#F5A77E;
   --amber:#F4A20B; --rose:#E5486A; --violet:#7B5CE0; --teal:#0F9E9A; --blue:#2F7BE5; --green:#26A65B; --orange:#FF6B2C;
   --r:18px; --r-sm:12px; --shadow:0 1px 0 rgba(30,36,71,.06), 0 6px 18px -10px rgba(30,36,71,.25);
   --font: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  color-scheme:light;
 }
+/* Dunkel: automatisch (Systemeinstellung) oder in den Einstellungen gewählt */
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --paper:#14182B; --grid:#1B2038; --card:#1F2541; --card2:#232A49; --text:#EEF0FA; --muted:#A4AACA; --line:#2F3762;
-    --ink:#9DAAFF; --ink-soft:#2A3263; --accent:#FF8A55; --accent-soft:#4A2C24;
+    --ink:#9DAAFF; --ink-soft:#2A3263; --on-ink:#10142A; --accent:#FF8A55; --accent-soft:#4A2C24;
     --good:#4CD394; --good-soft:#173B2E; --bad:#FF6F8A; --bad-soft:#47202C; --warn:#FFB443; --warn-soft:#45351A;
-    --q:#26305E; --q-line:#5868C2; --a:#46302A; --a-line:#B9714D;
+    --q:#26305E; --q-line:#5868C2; --a:#46302A; --a-line:#B9714D; --graph-grid:#2A3152;
     --shadow:0 1px 0 rgba(0,0,0,.2), 0 8px 20px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
   }
+}
+:root[data-theme="dark"]{
+    --paper:#14182B; --grid:#1B2038; --card:#1F2541; --card2:#232A49; --text:#EEF0FA; --muted:#A4AACA; --line:#2F3762;
+    --ink:#9DAAFF; --ink-soft:#2A3263; --on-ink:#10142A; --accent:#FF8A55; --accent-soft:#4A2C24;
+    --good:#4CD394; --good-soft:#173B2E; --bad:#FF6F8A; --bad-soft:#47202C; --warn:#FFB443; --warn-soft:#45351A;
+    --q:#26305E; --q-line:#5868C2; --a:#46302A; --a-line:#B9714D; --graph-grid:#2A3152;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 8px 20px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -63,13 +67,13 @@ a{color:var(--ink)}
 p.center{display:block}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
 .row.end{justify-content:flex-end}
+.dlg-box .row.end{flex-wrap:wrap}
 .row.center{justify-content:center}
 
 /* Knöpfe */
 .btn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:11px 20px;font-weight:700;min-height:48px;box-shadow:var(--shadow);transition:transform .08s}
 .btn:active{transform:scale(.97)}
-.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
-@media (prefers-color-scheme: dark){.btn.primary{color:#10142A}}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
 .btn.ghost{background:transparent;box-shadow:none}
 .btn.small{min-height:40px;padding:7px 14px;font-size:15px}
 .btn.xl{font-size:20px;padding:14px 32px;min-height:58px}
@@ -87,9 +91,8 @@ p.center{display:block}
 .hometile strong{font-size:19px}
 .hometile span:last-child{color:var(--muted);font-size:14px}
 .ht-icon{font-size:34px;line-height:1;margin-bottom:6px}
-.hometile.scan{background:var(--ink);border-color:var(--ink);color:#fff}
-.hometile.scan span:last-child{color:rgba(255,255,255,.8)}
-@media (prefers-color-scheme: dark){.hometile.scan{color:#10142A}.hometile.scan span:last-child{color:rgba(16,20,42,.75)}}
+.hometile.scan{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.hometile.scan span:last-child{color:var(--on-ink);opacity:.8}
 .hometile.teach{border-color:var(--accent)}
 .foot{text-align:center;color:var(--muted);font-size:14px;margin-top:28px}
 .foot p{margin:4px 0}
@@ -153,8 +156,7 @@ p.center{display:block}
 
 /* Graph */
 .graph{display:block;width:100%;height:auto}
-.g-grid line{stroke:var(--grid);stroke-width:1}
-@media (prefers-color-scheme: light){.g-grid line{stroke:#E6E1D6}}
+.g-grid line{stroke:var(--graph-grid);stroke-width:1}
 .g-axis line{stroke:var(--muted);stroke-width:1.4}
 .g-axis path{fill:var(--muted)}
 .g-lab text{font:600 11px var(--font);fill:var(--muted)}
@@ -234,9 +236,9 @@ p.center{display:block}
 
 /* Spielleitung */
 .leader{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding-top:10px}
-.lead-nr{font-weight:800;color:var(--muted);font-size:clamp(18px,3vw,28px)}
-.lead-prompt{font-weight:900;font-size:clamp(44px,10vw,120px);line-height:1.1;min-height:1.2em;max-width:100%;overflow-wrap:anywhere}
-.lead-list{text-align:left;columns:2 260px;font-size:18px;background:var(--card);border-radius:var(--r);padding:14px 14px 14px 40px;border:2px solid var(--line);width:100%}
+.lead-nr{font-weight:800;color:var(--muted);font-size:calc(clamp(18px,3vw,28px) * var(--beam))}
+.lead-prompt{font-weight:900;font-size:calc(clamp(44px,10vw,120px) * var(--beam));line-height:1.1;min-height:1.2em;max-width:100%;overflow-wrap:anywhere}
+.lead-list{text-align:left;columns:2 260px;font-size:calc(18px * var(--beam));background:var(--card);border-radius:var(--r);padding:14px 14px 14px 40px;border:2px solid var(--line);width:100%}
 
 /* Schiffe */
 .board{width:100%;max-width:520px;height:auto;display:block;background:var(--card);border-radius:var(--r);border:2px solid var(--line);touch-action:manipulation}
@@ -262,7 +264,7 @@ p.center{display:block}
 .cval{min-width:56px;text-align:center;font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
 .cview{font-size:24px;font-weight:900;color:var(--ink)}
 .shotmsg{background:var(--card);border:2px solid var(--line);border-radius:var(--r-sm);padding:12px;font-weight:700;text-align:center}
-.shotmsg.big{font-size:22px}
+.shotmsg.big{font-size:calc(22px * var(--beam))}
 .shotmsg.hit{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
 .shotmsg.sunk{border-color:var(--bad);background:var(--bad);color:#fff}
 .shotmsg.miss{border-color:var(--blue);color:var(--blue)}
@@ -270,7 +272,7 @@ p.center{display:block}
 .missbtn{border-color:var(--blue);color:var(--blue)}
 .tabs{display:flex;gap:6px;justify-content:center}
 .tab{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:9px 18px;font-weight:800}
-.tab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.tab.on{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
 
 /* Rallye */
 .slots{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
@@ -292,28 +294,28 @@ p.center{display:block}
 .solution .word{font-size:24px;letter-spacing:3px;color:var(--accent)}
 
 /* Bewegungspause */
-.move-rule{text-align:center;font-weight:800;font-size:clamp(18px,3vw,30px);background:var(--accent-soft);border-radius:var(--r);padding:12px}
-.move-big{text-align:center;font-weight:900;font-size:clamp(38px,8vw,92px);line-height:1.15;min-height:2.4em;display:grid;place-items:center;overflow-wrap:anywhere}
+.move-rule{text-align:center;font-weight:800;font-size:calc(clamp(18px,3vw,30px) * var(--beam));background:var(--accent-soft);border-radius:var(--r);padding:12px}
+.move-big{text-align:center;font-weight:900;font-size:calc(clamp(38px,8vw,92px) * var(--beam));line-height:1.15;min-height:2.4em;display:grid;place-items:center;overflow-wrap:anywhere}
 .cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;width:100%}
 .cmp-side{background:var(--card);border:3px solid var(--line);border-radius:var(--r);padding:16px}
 .cmp-side small{display:block;font-size:.3em;color:var(--muted)}
 .cmp-vs{font-size:.4em;color:var(--muted)}
-.move-reveal{text-align:center;font-weight:900;font-size:clamp(30px,6vw,64px);min-height:1.3em}
+.move-reveal{text-align:center;font-weight:900;font-size:calc(clamp(30px,6vw,64px) * var(--beam));min-height:1.3em}
 .move-reveal small{display:block;font-size:.4em;font-weight:700;color:var(--muted)}
 .move-reveal.yes{color:var(--good)}
 .move-reveal.no{color:var(--bad)}
-.leader-wide .hud .pill{font-size:clamp(15px,2vw,22px)}
+.leader-wide .hud .pill{font-size:calc(clamp(15px,2vw,22px) * var(--beam))}
 
 /* QR präsentieren */
 .present{display:grid;grid-template-columns:minmax(0,auto) minmax(260px,1fr);gap:24px;align-items:center}
 @media (max-width:800px){.present{grid-template-columns:1fr}}
 .present-qr{background:#fff;border-radius:var(--r);padding:10px;box-shadow:var(--shadow);justify-self:center}
 .present-qr .qrcanvas{display:block;width:min(72vh,86vw,640px);height:auto;image-rendering:pixelated}
-.present-game{font-size:clamp(26px,3.5vw,40px);font-weight:900}
-.present-topic{font-size:clamp(20px,2.4vw,28px);font-weight:700;color:var(--ink)}
+.present-game{font-size:calc(clamp(26px,3.5vw,40px) * var(--beam));font-weight:900}
+.present-topic{font-size:calc(clamp(20px,2.4vw,28px) * var(--beam));font-weight:700;color:var(--ink)}
 .present-set{color:var(--muted);font-size:18px;margin-top:4px}
-.present-steps{font-size:18px;padding-left:22px}
-.present-code{font-family:var(--mono);font-size:clamp(24px,3.2vw,40px);font-weight:800;letter-spacing:2px;background:var(--card);border:2px dashed var(--line);border-radius:var(--r-sm);padding:10px 14px;display:inline-block}
+.present-steps{font-size:calc(18px * var(--beam));padding-left:22px}
+.present-code{font-family:var(--mono);font-size:calc(clamp(24px,3.2vw,40px) * var(--beam));font-weight:800;letter-spacing:2px;background:var(--card);border:2px dashed var(--line);border-radius:var(--r-sm);padding:10px 14px;display:inline-block}
 .present-btns{justify-content:center}
 
 /* Ergebnis */
@@ -342,37 +344,61 @@ p.center{display:block}
 @media (max-width:420px){.hometile{min-height:136px;padding:14px 12px}.hometile strong{font-size:17px}.btn.xl{font-size:18px;padding:12px 24px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* Drucken: nur die Stationskarten */
-#printArea{display:none}
-@media print{
-  body.printing>*:not(#printArea){display:none!important}
-  body.printing{background:#fff}
-  body.printing #printArea{display:grid;grid-template-columns:1fr 1fr;gap:10mm}
-  #printArea .ppage{grid-column:1/-1;break-after:page;color:#111}
-  #printArea .ppage .card{border:none;box-shadow:none;background:#fff}
-  #printArea .scard{break-inside:avoid;border:2px dashed #555;padding:8mm}
-  #printArea .scard img{width:62mm;height:62mm;image-rendering:pixelated}
-  #printArea .scard-nr{font-size:28pt}
-}
+
+/* Startseite: Sprache und Einstellungen */
+.homebar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:calc(6px + env(safe-area-inset-top))}
+.lang{display:inline-flex;padding:3px;gap:2px;border-radius:999px;background:var(--card);border:2px solid var(--line);box-shadow:var(--shadow)}
+.langbtn{border:0;background:transparent;border-radius:999px;min-width:48px;height:40px;font-size:24px;line-height:1;padding:0 8px;opacity:.45;filter:grayscale(.7)}
+.langbtn[aria-pressed="true"]{background:var(--ink-soft);opacity:1;filter:none}
+.gear{font-size:22px;min-width:48px;height:48px;padding:0}
+.hometiles.three .hometile.self{grid-column:1/-1;min-height:110px}
+.hero{padding-top:8px}
+
+/* Einstellungen */
+.setcard{margin-bottom:12px;display:grid;gap:10px}
+.setcard h3{margin:0;font-size:18px}
+.setcard p{margin:0}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:12px;font-weight:600}
+.setrow.col{flex-direction:column;align-items:stretch;gap:6px}
+.switch{position:relative;width:58px;height:34px;border-radius:999px;border:2px solid var(--line);background:var(--card2);padding:0;flex:0 0 auto}
+.switch .knob{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
+.switch[aria-checked="true"]{background:var(--ink);border-color:var(--ink)}
+.switch[aria-checked="true"] .knob{transform:translateX(24px);background:var(--on-ink)}
+.seg{display:flex;gap:4px;background:var(--card2);border:2px solid var(--line);border-radius:999px;padding:3px}
+.seg button{flex:1;border:0;background:transparent;border-radius:999px;padding:9px 6px;font-weight:700;color:var(--muted);min-height:42px}
+.seg button.on{background:var(--ink);color:var(--on-ink)}
+
+/* Lehrkraft-Paket */
+.pro-head{text-align:center;padding:8px 0 4px}
+.pro-head h2{margin:6px 0 4px;font-size:28px}
+.pro-list{margin:8px 0 0;padding-left:0;list-style:none;display:grid;gap:8px}
+.pro-facts{list-style:none;padding:0;margin:14px 0;display:grid;gap:6px;font-weight:600}
+.pro-status{background:var(--good-soft);border:2px solid var(--good);border-radius:var(--r-sm);padding:12px;font-weight:800;text-align:center}
+.pro-banner{display:block;width:100%;text-align:left;border:2px dashed var(--accent);background:var(--accent-soft);color:var(--text);border-radius:var(--r);padding:12px 14px;margin:0 0 14px;font-weight:600}
+.badge{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 9px}
+.notice.warn{border-color:var(--warn);background:var(--warn-soft)}
+.wide-line{flex-basis:100%}
 </style>
 </head>
 <body>
 <header class="bar">
-  <button type="button" class="iconbtn" id="btnBack" aria-label="Zur Startseite">‹ Start</button>
+  <button type="button" class="iconbtn" id="btnBack">‹</button>
   <h1 id="barTitle">MatheSnack</h1>
 </header>
 <main id="view" class="view"></main>
 <div id="dlg" class="dlg" hidden></div>
 <div id="toast" role="status" aria-live="polite" hidden></div>
-<div id="printArea"></div>
-<noscript><p style="padding:20px">MatheSnack braucht JavaScript.</p></noscript>
-<script src="js/core.js?v=0.1.0"></script>
-<script src="js/content.js?v=0.1.0"></script>
-<script src="js/qr.js?v=0.1.0"></script>
-<script src="js/jsqr.js?v=0.1.0"></script>
-<script src="js/games.js?v=0.1.0"></script>
-<script src="js/teacher.js?v=0.1.0"></script>
-<script src="js/app.js?v=0.1.0"></script>
+<noscript><p style="padding:20px">MatheSnack braucht JavaScript. / MatheSnack needs JavaScript.</p></noscript>
+<script src="js/core.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/content.js"></script>
+<script src="js/qr.js"></script>
+<script src="js/jsqr.js"></script>
+<script src="js/games.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/teacher.js"></script>
+<script src="js/app.js"></script>
 <script src="cordova.js"></script>
 </body>
 </html>

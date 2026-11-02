@@ -1,138 +1,177 @@
 # MatheSnack nach TestFlight bringen
 
-Stand: Version 0.1.0, iOS-Build 100. Der Weg folgt Drawmory. Was du dort
-schon hast, nutzt du weiter; neu ist nur, was an der Kennung
-`de.mathesnack.app` hängt. MatheSnack hat **keinen In-App-Kauf** und **keine
-Universal Links** – die Schritte dazu aus Drawmory entfallen.
+Stand: Version 0.2.0, iOS-Build 200. Der Weg folgt Drawmory.
+
+**Schon mit 0.1 in TestFlight?** Dann gilt nur der Abschnitt
+[Update auf 0.2](#update-auf-02-einmalig) – dort steht alles, was für
+In-App-Kauf, Universal Links und die neue Pages-Einstellung dazukommt.
 
 | Bereits vorhanden (Drawmory/FairMix) | Neu für MatheSnack |
 |---|---|
-| Apple-Distribution-Zertifikat (.p12) samt Passwort | App-ID `de.mathesnack.app` |
-| Team-ID, Signier-Identität | App-Store-Profil für diese App-ID |
+| Apple-Distribution-Zertifikat (.p12) samt Passwort | App-ID `de.mathesnack.app` mit **Associated Domains** |
+| Team-ID `7LPBMXVK6D`, Signier-Identität | App-Store-Profil für diese App-ID |
 | App-Store-Connect-API-Schlüssel (.p8, Key-ID, Issuer-ID) | App in App Store Connect |
-| | Secrets im Repo **MatheSnack** (Secrets gelten je Repo) |
+| Vertrag „Kostenpflichtige Apps“ | In-App-Kauf `de.mathesnack.app.lehrkraft` |
+| Repo `simaehlmann-cloud.github.io` mit Freigabedatei | MatheSnack-Eintrag in dieser Freigabedatei |
 
 ---
 
-## 1. Repo vorbereiten
+## Update auf 0.2 (einmalig)
 
-Repo `MatheSnack` anlegen, Dateien hochladen, **Settings → Pages** auf
-Branch `main`, Ordner `/ (root)`. Danach ist die Datenschutzerklärung unter
-`https://simaehlmann-cloud.github.io/MatheSnack/datenschutz.html`
-erreichbar – diese Adresse verlangt App Store Connect.
+### A. GitHub Pages auf den Ordner `docs` umstellen
 
-## 2. App-ID anlegen
+Die App liegt jetzt in `www/` und wird **nicht mehr** als Webseite
+veröffentlicht. Pages liefert nur noch die Hinweisseite für QR-Codes,
+Datenschutz und Impressum aus.
 
-developer.apple.com → **Certificates, Identifiers & Profiles** →
-**Identifiers** → **+**
+Repo **MatheSnack** → **Settings → Pages** → Branch `main`, Ordner **`/docs`**
+→ **Save**. Nach 1–2 Minuten prüfen:
 
-- Typ: **App IDs** → **App**
-- Beschreibung: `MatheSnack`
-- Bundle ID: **Explicit**, `de.mathesnack.app`
-- Capabilities: **keine** zusätzlichen anhaken. (In-App Purchase ist
-  vorausgewählt und stört nicht.) Die Kamera braucht keine Capability, nur den
-  Hinweistext – der steht schon in der `config.xml`.
+- `https://simaehlmann-cloud.github.io/MatheSnack/` – kleine Infoseite
+- `https://simaehlmann-cloud.github.io/MatheSnack/datenschutz.html` – Datenschutz
+  (diese Adresse verlangt App Store Connect)
+- `https://simaehlmann-cloud.github.io/MatheSnack/open/#s=0SWK43X452NJ0F0` –
+  Hinweisseite „Mathe-Spiel bereit“
 
-## 3. App-Store-Profil erzeugen
+### B. App-ID um „Associated Domains“ erweitern
 
-**Profiles** → **+** → **Distribution: App Store Connect** →
-App-ID `de.mathesnack.app` → dein vorhandenes **Apple-Distribution-Zertifikat**
-→ Name `MatheSnack App Store` → herunterladen.
+Damit die Handy-Kamera einen QR-Code **direkt in der App** öffnet.
 
-Als base64 in die Zwischenablage (Windows PowerShell, im Ordner Downloads):
+1. developer.apple.com → **Identifiers** → `de.mathesnack.app` →
+   **Associated Domains** anhaken → **Save** (Hinweis zu Profilen bestätigen).
+   „In-App Purchase“ ist schon aktiv – nichts weiter anhaken.
+2. **Profiles** → `MatheSnack App Store` → **Edit** → **Save** → **Download**.
+   Das alte Profil ist durch die neue Fähigkeit ungültig geworden.
+3. In base64 umwandeln (PowerShell, im Ordner Downloads):
+   ```powershell
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\MatheSnack_App_Store.mobileprovision")) | Set-Clipboard
+   ```
+4. Repo MatheSnack → **Settings → Secrets and variables → Actions** →
+   `IOS_PROVISIONING_PROFILE` → **Update** → einfügen.
 
-```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\MatheSnack_App_Store.mobileprovision")) | Set-Clipboard
-```
+Vergisst du B, bricht der Workflow mit „Das Profil erlaubt keine Associated
+Domains“ ab – bevor eine Build-Nummer verbraucht ist.
 
-Das Drawmory-Profil funktioniert hier nicht. Der Workflow erkennt das und
-bricht mit einer klaren Meldung ab, statt beim Signieren zu scheitern.
+### C. Freigabedatei ergänzen (Repo `simaehlmann-cloud.github.io`)
 
-## 4. Secrets im Repo MatheSnack anlegen
+Genaue Anleitung: [`universal-links/LIESMICH.md`](universal-links/LIESMICH.md).
+Kurz: Den Inhalt von `universal-links/.well-known/apple-app-site-association`
+in die gleichnamige Datei im Repo `simaehlmann-cloud.github.io` kopieren. Die
+Datei enthält Drawmory **und** MatheSnack mit deiner Team-ID – Drawmory
+funktioniert unverändert weiter.
 
-Repo → **Settings → Secrets and variables → Actions → New repository secret**.
+### D. In-App-Kauf anlegen
 
-| Name | Inhalt |
-|---|---|
-| `IOS_CERTIFICATE_P12_BASE64` | wie bei Drawmory |
-| `IOS_CERTIFICATE_PASSWORD` | wie bei Drawmory |
-| `IOS_TEAM_ID` | wie bei Drawmory |
-| `IOS_SIGNING_IDENTITY` | wie bei Drawmory, z. B. `Apple Distribution: Simon Mählmann (TEAMID)` |
-| `IOS_PROVISIONING_PROFILE` | **neu:** base64 aus Schritt 3 |
-| `ASC_KEY_ID` | wie bei Drawmory |
-| `ASC_ISSUER_ID` | wie bei Drawmory |
-| `ASC_KEY_P8` | wie bei Drawmory, vollständig mit BEGIN/END-Zeilen |
+App Store Connect → MatheSnack → **Monetarisierung → In-App-Käufe** → **+**
 
-## 5. App in App Store Connect anlegen
+- Typ: **Nicht-Verbrauchsartikel**
+- Referenzname: `Lehrkraft-Paket`
+- Produkt-ID: **`de.mathesnack.app.lehrkraft`** – exakt so, sie steht in der App fest
+- Preis: **4,99 €**, Verfügbarkeit: alle Länder
+- **Familienfreigabe**: einschalten (die App wirbt damit)
+- Lokalisierung Deutsch: Anzeigename `Lehrkraft-Paket`,
+  Beschreibung `Alle Spiele für die ganze Klasse: Domino, Bingo, Schiffe, Rallye u. a.`
+- Lokalisierung Englisch: `Teacher Pack`,
+  `Every game for the whole class: dominoes, bingo, battleships, rally and more`
+- Prüfungsinformationen: Bildschirmfoto des Paket-Bildschirms
+  (Einstellungen → „Lehrkraft-Paket ansehen“) und als Notiz der Text aus
+  [Prüfungsanmerkungen](#prüfungsanmerkungen-für-apple).
 
-appstoreconnect.apple.com → **Apps** → **+** → **Neue App**
+Ziel: Status **„Bereit zur Einreichung“**. Steht dort „Fehlende Metadaten“,
+lädt das Produkt in TestFlight unter Umständen nicht („Preis wird geladen …“).
 
-- Plattform: iOS
-- Name: `MatheSnack` (falls vergeben: `MatheSnack – Mathe-Einstieg`, max. 30 Zeichen)
-- Primärsprache: Deutsch
-- Bundle-ID: `de.mathesnack.app`
-- SKU: `mathesnack-ios`
+Den Vertrag „Kostenpflichtige Apps“ hast du von Drawmory – er gilt für das
+ganze Konto. Falls noch nicht geschehen: Beim **App Store Small Business
+Program** anmelden (Provision 15 % statt 30 %).
 
-Danach unter **App-Informationen**:
+### E. Englische Store-Seite
 
-- Untertitel: `Mathe-Spiele per QR-Code`
-- Primäre Kategorie: **Bildung**, sekundäre: Spiele (Lernspiele)
-- Datenschutzrichtlinie: die Pages-Adresse aus Schritt 1
-- Altersfreigabe: alle Fragen mit „Keine“ → 4+
+App Store Connect → MatheSnack → **App-Informationen** → oben rechts
+**Englisch (USA)** und **Englisch (UK)** hinzufügen. Untertitel z. B.
+`Maths games via QR code`, Datenschutz-URL
+`https://simaehlmann-cloud.github.io/MatheSnack/datenschutz-en.html`.
+Die App selbst wählt die Sprache nach dem Gerät und lässt sich mit den
+Flaggen auf der Startseite umschalten.
 
-Unter **App-Datenschutz**: „Daten werden nicht erfasst“. Das deckt sich mit
-der Datenschutzerklärung und dem Privacy-Manifest. Die Kamera zählt dabei
-nicht als Datenerhebung, weil das Bild das Gerät nicht verlässt.
-
-**Kids-Kategorie:** Bewusst *nicht* wählen. Sie verlangt eine elterliche
-Schranke vor jedem Link nach außen (Datenschutz, Impressum) und wird strenger
-geprüft. Für eine Unterrichts-App in Klasse 5–10 reicht „Bildung“ mit 4+.
-
-## 6. Build hochladen
+### F. Build hochladen
 
 Repo → **Actions → Build MatheSnack (iOS) → Run workflow** (Branch `main`).
+Im Schritt **„Erzeugtes Projekt bestätigen“** stehen Kennung, Version 0.2.0,
+Build 200, Kamera- und Foto-Hinweis, URL-Schema `mathesnack://`, die Plugins
+für Kauf, Teilen und Links, StoreKit, Associated Domains und das
+Privacy-Manifest.
 
-- Erst laufen auf Linux die Prüfungen (`validate.js` und der Ablauftest).
-- Dann baut ein Mac die App. Im Schritt **„Erzeugtes Projekt bestätigen“**
-  stehen Kennung, Version 0.1.0, Build 100, Export-Erklärung, Kamera-Hinweis
-  und Privacy-Manifest. Jeder Fehler dort bricht ab, bevor eine Build-Nummer
-  verbraucht ist.
-- Hochgeladen wird **nur bei „Run workflow“**, nicht bei jedem Push.
+### G. Testen in TestFlight
 
-Dauer etwa 15–25 Minuten.
+1. **MatheSnack löschen** und Build 200 neu installieren (nur bei der
+   Installation holt iOS die Link-Freigabe ab).
+2. **Sprache:** Flaggen 🇩🇪/🇬🇧 oben auf der Startseite.
+3. **Dunkelmodus:** ⚙️ → Darstellung → Schalter „Dunkelmodus“.
+4. **Probestarts:** „Spiel für die Klasse“ → Domino → „QR-Code präsentieren“ →
+   Dialog „noch 3 von 3 Probestarts“.
+5. **Kauf:** ⚙️ → „Lehrkraft-Paket ansehen“ → „Für 4,99 € freischalten“.
+   TestFlight-Käufe laufen in Apples Testumgebung: **es wird nichts
+   abgebucht**, auch wenn ein Preis erscheint.
+6. **Wiederherstellen:** App löschen, neu installieren → ⚙️ →
+   „Käufe wiederherstellen“.
+7. **QR-Code mit der Kamera-App:** Von einem zweiten Gerät (oder vom Laptop
+   über die Hinweisseite) einen Code zeigen und mit der normalen Kamera
+   scannen → Banner „In MatheSnack öffnen“. Öffnet sich stattdessen Safari mit
+   der Hinweisseite, kennt Apples Zwischenspeicher die Freigabe noch nicht
+   (bis zu 24 Stunden) – der Knopf „In MatheSnack öffnen“ dort funktioniert
+   trotzdem.
+8. **Scanner in der App:** „QR-Code scannen“. Falls das Live-Bild nicht
+   erscheint, „Foto aufnehmen“ nutzen und mir Bescheid geben – das
+   Kamerabild im iOS-WebView lässt sich nur auf einem echten Gerät prüfen.
+9. **Stationskarten:** Rallye → „Stationskarten erstellen“ → „Als PDF teilen /
+   drucken“ → im Teilen-Menü „Drucken“ oder „In Dateien sichern“.
 
-## 7. TestFlight
+---
 
-Nach 5–30 Minuten Verarbeitung erscheint der Build unter **TestFlight**.
-**Interne Tests → +** → Gruppe `Ich` → dich als Tester hinzufügen → Build
-zuordnen. Mail öffnen, TestFlight-App installieren, MatheSnack laden.
+## Erstmalige Einrichtung (falls noch nicht geschehen)
 
-## 8. Testen
-
-1. Am Laptop (Pages-Fassung) „Spiel für die Klasse“ → QR-Code präsentieren.
-2. In der App **QR-Code scannen** → iOS fragt einmal nach der Kamera →
-   Spiel startet.
-3. Mit der **Kamera-App** gescannt öffnet sich die Webfassung in Safari, nicht
-   die App. Das ist so gewollt (ohne Universal Links); beide spielen dasselbe.
+1. **App-ID** `de.mathesnack.app` anlegen (Explicit), Capabilities
+   **In-App Purchase** und **Associated Domains**.
+2. **Profil** „Distribution: App Store Connect“ für diese App-ID mit dem
+   vorhandenen Distribution-Zertifikat, Name `MatheSnack App Store`.
+3. **Secrets** im Repo MatheSnack (Werte wie bei Drawmory, nur das Profil ist neu):
+   `IOS_CERTIFICATE_P12_BASE64`, `IOS_CERTIFICATE_PASSWORD`, `IOS_TEAM_ID`,
+   `IOS_SIGNING_IDENTITY`, `IOS_PROVISIONING_PROFILE`, `ASC_KEY_ID`,
+   `ASC_ISSUER_ID`, `ASC_KEY_P8`.
+4. **App in App Store Connect:** Name `MatheSnack`, Primärsprache Deutsch,
+   Bundle-ID `de.mathesnack.app`, SKU `mathesnack-ios`. Kategorie **Bildung**,
+   sekundär Spiele. Altersfreigabe 4+. Datenschutz: „Daten werden nicht
+   erfasst“ (die Kamera zählt nicht, das Bild verlässt das Gerät nicht).
+   **Nicht** die Kids-Kategorie wählen (sie verlangt Elternschranken vor
+   jedem Link und vor dem Kauf).
+5. Danach weiter mit [Update auf 0.2](#update-auf-02-einmalig), Schritte A–G.
 
 ## Nächste Builds
 
 Vor jedem weiteren Upload `ios-CFBundleVersion` in der `config.xml` anheben
 (jede Nummer ist bei Apple dauerhaft belegt). Bei einer neuen Version auch
-die übrigen Stellen aus der README, Abschnitt „Neue Version“.
+`APP_VERSION` in `www/js/core.js` und `version`/`android-versionCode` in der
+`config.xml` – `validate.js` meldet Abweichungen.
+
+## Android (Play Console, später)
+
+- In-App-Produkt: **Monetarisieren → Produkte → In-App-Produkte** →
+  Produkt-ID `de.mathesnack.app.lehrkraft`, 4,99 €.
+- Käufe lassen sich nur mit einer App testen, die aus Google Play kommt
+  (interner Test-Track) – im Debug-APK aus GitHub Actions bleibt der Kaufknopf
+  bei „Preis wird geladen“. Alles andere (Probestarts, Spiele, Scanner) lässt
+  sich mit dem Debug-APK testen.
+- Lizenztester: Play Console → Einstellungen → Lizenztests → eigenes Konto.
 
 ## Prüfungsanmerkungen für Apple
 
-Beim Einreichen zur Prüfung (nicht für TestFlight intern nötig) ins Feld
-*Notizen*:
-
-> MatheSnack is a classroom math warm-up. A teacher selects a game and shows
+> MatheSnack is a classroom maths warm-up. A teacher selects a game and shows
 > a QR code; students scan it and play on their own device. No account, no
-> server, no data collection. To test without a second device: tap
-> "Selbst üben" (practice) on the home screen and pick any game, or tap
-> "Code eingeben" and enter a code shown under "Spiel für die Klasse →
-> QR-Code präsentieren". The camera is used only to read QR codes on-device.
-
-Bei Apple 4.2 (Mindestfunktionalität) hilft, dass die App neun Spiele und
-eigene Inhalte mitbringt und nicht nur eine Webseite einpackt; die Spiele
-laufen vollständig offline.
+> server, no data collection. Students never see purchase offers – playing a
+> scanned game is always free. The "Teacher Pack" (non-consumable in-app
+> purchase) unlocks six additional class games for teachers; three trial
+> starts per game are included. To test: tap "Game for the class" →
+> "Dominoes" → "Show QR code". The purchase screen is also under Settings
+> (gear icon) → "View Teacher Pack", including "Restore purchases". The camera
+> is used only to read QR codes on-device. The app is available in German
+> and English (flags on the home screen).

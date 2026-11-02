@@ -45,6 +45,10 @@ jobs:
     env:
       APP_ID: de.mathesnack.app
       APP_NAME: MatheSnack
+      URL_SCHEME: mathesnack
+      # Domain der Universal Links (QR-Codes). Muss zu SHARE_BASE in www/js/core.js
+      # und zu LINK_HOST in der config.xml passen – validate.js gleicht das ab.
+      LINK_HOST: simaehlmann-cloud.github.io
       CORDOVA_CLI: '13.0.0'
       CORDOVA_IOS: '8.1.1'
 
@@ -95,10 +99,9 @@ jobs:
           cp res/ios/* build/res/ios/
           cp res/android/* build/res/android/
 
+          # Die App steht vollständig in www/ (docs/ ist nur die Pages-Hinweisseite).
           rm -rf build/www/*
-          cp index.html manifest.json sw.js datenschutz.html impressum.html build/www/
-          cp icon.png icon-180.png icon-192.png icon-maskable-512.png build/www/
-          cp -r js build/www/js
+          cp -r www/. build/www/
 
           grep -o 'id="[^"]*"' build/config.xml | head -1
           grep -o '<name>[^<]*</name>' build/config.xml | head -1
@@ -157,6 +160,35 @@ jobs:
           [ "$BUILDNR" = "$SOLL_BUILD" ] || { echo "::error::Build-Nummer ist '$BUILDNR', config.xml sagt '$SOLL_BUILD'."; FEHLER=1; }
           [ "$KRYPTO" = "false" ] || { echo "::error::ITSAppUsesNonExemptEncryption fehlt – jeder Upload fragt sonst nach."; FEHLER=1; }
           [ "$KAMERA" != "FEHLT" ] || { echo "::error::NSCameraUsageDescription fehlt – iOS beendet die App beim ersten Scan."; FEHLER=1; }
+          FOTOS=$(holen NSPhotoLibraryAddUsageDescription)
+          [ "$FOTOS" != "FEHLT" ] || { echo "::error::NSPhotoLibraryAddUsageDescription fehlt – „Bild sichern“ im Teilen-Menü beendet die App."; FEHLER=1; }
+
+          # mathesnack:// muss als URL-Schema eingetragen sein (Hinweisseite → App).
+          if /usr/libexec/PlistBuddy -c "Print :CFBundleURLTypes" "$PLIST" 2>/dev/null | grep -q "$URL_SCHEME"; then
+            echo "URL-Schema:       $URL_SCHEME://"
+          else
+            echo "::error::URL-Schema $URL_SCHEME fehlt in der Info.plist (cordova-plugin-customurlscheme)."; FEHLER=1
+          fi
+
+          # Lehrkraft-Paket: Ohne das Kauf-Plugin gäbe es in TestFlight keinen
+          # Kaufknopf mit Preis, sondern dauerhaft „Preis wird geladen“.
+          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing mathesnack-links; do
+            cordova plugin ls | grep -q "^$P" && echo "Plugin $P installiert" || { echo "::error::Plugin $P fehlt."; FEHLER=1; }
+          done
+          if grep -q 'StoreKit.framework' "$PBX"; then
+            echo "StoreKit:         eingebunden"
+          else
+            echo "::warning::StoreKit.framework nicht in der Projektdatei gefunden – im Build-Protokoll prüfen."
+          fi
+
+          # Universal Links: Freigabe im Release-Build. Ohne sie öffnet ein
+          # gescannter QR-Code nur die Hinweisseite.
+          ENT=$(find platforms/ios -name 'Entitlements-Release.plist' -not -path '*/Plugins/*' | head -1)
+          if [ -n "$ENT" ] && /usr/libexec/PlistBuddy -c 'Print :com.apple.developer.associated-domains' "$ENT" 2>/dev/null | grep -q "applinks:$LINK_HOST"; then
+            echo "Associated Domains: applinks:$LINK_HOST (Release)"
+          else
+            echo "::error::applinks:$LINK_HOST fehlt in ${ENT:-Entitlements-Release.plist}."; FEHLER=1
+          fi
 
           # cordova-ios 8 legt ein eigenes PrivacyInfo.xcprivacy mit leerem
           # NSPrivacyAccessedAPITypes an. Unseres nennt den Grund CA92.1 und
@@ -225,6 +257,17 @@ jobs:
             *) echo "::error::Das Profil gehört zu '$PROFIL_APP', nicht zu $APP_ID. Für MatheSnack ein eigenes App-Store-Profil anlegen (TESTFLIGHT.md)."; exit 1 ;;
           esac
 
+          # Seit 0.2 trägt die App die Fähigkeit "Associated Domains". Ein Profil,
+          # das vor dem Einschalten dieser Fähigkeit erzeugt wurde, enthält sie
+          # nicht – das Signieren scheitert dann mit einer schwer lesbaren
+          # Xcode-Meldung. Deshalb hier vorher und klar (wie bei Drawmory 0.3).
+          if /usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.associated-domains' /dev/stdin <<< "$PROFIL_PLIST" > /dev/null 2>&1; then
+            echo "Profil erlaubt Associated Domains."
+          else
+            echo "::error::Das Profil erlaubt keine Associated Domains. developer.apple.com → Identifiers → de.mathesnack.app → 'Associated Domains' anhaken und speichern → Profiles → 'MatheSnack App Store' → Edit → Save → neu herunterladen → Secret IOS_PROVISIONING_PROFILE ersetzen (TESTFLIGHT.md, Schritt A)."
+            exit 1
+          fi
+
           BUND="$RUNNER_TEMP/signieren.keychain-db"
           BUND_PW=$(uuidgen)
           security create-keychain -p "$BUND_PW" "$BUND"
@@ -269,9 +312,46 @@ jobs:
           JSON
           cordova build ios --release --device
           rm -f build.json
+          # Gegenprobe am fertigen Paket: Die signierte App muss die
+          # Domain-Freigabe tragen, sonst öffnen QR-Codes nur die Hinweisseite.
           IPA=$(find platforms/ios/build -name '*.ipa' | head -1)
           [ -n "$IPA" ] || { echo "::error::Keine IPA gefunden."; exit 1; }
           echo "IPA: $IPA"
+          PRUEF="$RUNNER_TEMP/ipa-pruefung"
+          rm -rf "$PRUEF" && mkdir -p "$PRUEF"
+          unzip -q "$IPA" -d "$PRUEF"
+          APPDIR=$(find "$PRUEF/Payload" -maxdepth 1 -name '*.app' | head -1)
+          if codesign -d --entitlements - "$APPDIR" 2>/dev/null | grep -q "applinks:$LINK_HOST"; then
+            echo "Signierte App trägt applinks:$LINK_HOST."
+          else
+            echo "::error::Die signierte App trägt applinks:$LINK_HOST nicht."
+            codesign -d --entitlements - "$APPDIR" 2>&1 | sed -n '1,40p'
+            exit 1
+          fi
+          rm -rf "$PRUEF"
+
+      # Die Freigabedatei liegt im Repo simaehlmann-cloud.github.io (siehe
+      # universal-links/LIESMICH.md). Fehlt sie oder fehlt MatheSnack darin,
+      # wird trotzdem gebaut und hochgeladen – nur öffnen QR-Codes dann die
+      # Hinweisseite statt der App. Deshalb Hinweis statt Abbruch.
+      - name: Universal-Link-Freigabe auf der Domain prüfen
+        if: steps.signieren.outputs.vorhanden == 'true'
+        env:
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          URL="https://$LINK_HOST/.well-known/apple-app-site-association"
+          INHALT=$(curl -fsSL --max-time 20 "$URL" || true)
+          if [ -z "$INHALT" ]; then
+            echo "::warning::$URL ist nicht erreichbar."
+            exit 0
+          fi
+          if printf '%s' "$INHALT" | grep -q "$TEAM_ID.$APP_ID"; then
+            echo "Freigabe auf $LINK_HOST nennt $TEAM_ID.$APP_ID."
+          else
+            echo "::warning::$URL nennt $TEAM_ID.$APP_ID noch nicht. Datei aus universal-links/ in das Repo simaehlmann-cloud.github.io übernehmen (universal-links/LIESMICH.md)."
+          fi
+          printf '%s' "$INHALT" | grep -q '/MatheSnack/open/' \
+            || echo "::warning::$URL enthält den Pfad /MatheSnack/open/* nicht."
 
       - name: IPA hochladen
         if: steps.signieren.outputs.vorhanden == 'true'

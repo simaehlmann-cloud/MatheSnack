@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Datenschutz – MatheSnack</title>
+<meta name="theme-color" content="#FBF7EF">
+<script>/* Darstellung wie in der App gewählt */try{var m=JSON.parse(localStorage.getItem("mathesnack.theme"));if(m==="light"||m==="dark")document.documentElement.setAttribute("data-theme",m);}catch(e){}</script>
+<style>
+  :root { --paper:#FBF7EF; --grid:#EFE7D8; --card:#fff; --text:#1E2447; --muted:#636A8A; --ink:#2B3A9E; --line:#E3DACA; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
+  }
+  :root[data-theme="dark"] { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:calc(24px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    background-color:var(--paper); color:var(--text);
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:26px 26px;
+    font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height:1.6;
+  }
+  main { max-width:760px; margin:0 auto; background:var(--card); border:2px solid var(--line); border-radius:24px; padding:24px; }
+  h1 { font-size:clamp(26px,5vw,34px); margin:0 0 4px; }
+  h2 { font-size:clamp(18px,4vw,21px); margin:30px 0 8px; }
+  .stand { color:var(--muted); font-size:14px; margin:0 0 24px; }
+  address { font-style:normal; }
+  a { color:var(--ink); }
+  .links { margin-top:32px; display:flex; flex-wrap:wrap; gap:10px; }
+  .links a { display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:700;
+             border:2px solid var(--line); color:var(--text); background:var(--card); }
+  .links a.back { background:var(--ink); border-color:var(--ink); color:#fff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Datenschutzerklärung</h1>
+  <p class="stand">MatheSnack · Stand: November 2026</p>
+
+  <h2>1. Verantwortlicher</h2>
+  <p>Verantwortlich im Sinne von Art. 4 Nr. 7 DSGVO ist:</p>
+  <address>
+    Wisdompeak Apps<br>
+    Inhaber: Simon Mählmann<br>
+    Oderstraße 13<br>
+    28844 Weyhe<br>
+    Deutschland<br>
+    E-Mail: <a href="mailto:smaehlmann.appdev@gmail.com">smaehlmann.appdev@gmail.com</a>
+  </address>
+  <p>Ein Datenschutzbeauftragter ist nicht bestellt, da die Voraussetzungen des Art. 37 DSGVO und des § 38 BDSG nicht vorliegen.</p>
+
+  <h2>2. Grundsatz: keine Datenerhebung</h2>
+  <p>MatheSnack verarbeitet keine personenbezogenen Daten auf Servern des Anbieters. Die App arbeitet offline. Es gibt keine Benutzerkonten, keine Registrierung, keine Eingabe von Namen, keine Analyse- oder Trackingdienste, keine Werbung und keine Weitergabe von Daten an Dritte. Alle Spiele entstehen auf dem Gerät aus einem kurzen Spielcode.</p>
+
+  <h2>3. Einsatz im Unterricht</h2>
+  <p>Die Lehrkraft erzeugt auf ihrem Gerät einen QR-Code, Schülerinnen und Schüler scannen ihn und spielen auf ihrem eigenen Gerät. Dabei fließen keine Daten zwischen den Geräten und keine Daten an den Anbieter. Ergebnisse werden nicht eingesammelt; sie stehen nur auf dem jeweiligen Gerät.</p>
+
+  <h2>4. Welche Daten auf dem Gerät gespeichert werden</h2>
+  <p>Ausschließlich im lokalen Speicher des Geräts liegen:</p>
+  <ul>
+    <li>Einstellungen zu Sprache, Darstellung, Tönen, Vibration und Schriftgröße</li>
+    <li>die zuletzt gewählten Einstellungen je Spiel (Thema, Dauer, Anzahl)</li>
+    <li>die eigene Bestleistung je Spiel und Thema</li>
+    <li>bei der Stationen-Rallye die gesammelten Buchstaben</li>
+    <li>beim Bingo die eigene Karte, solange die App geöffnet ist</li>
+    <li>ob das Lehrkraft-Paket gekauft wurde und wie viele Probestarts genutzt sind</li>
+    <li>im Schülergerät-Modus die von der Lehrkraft gewählte PIN</li>
+  </ul>
+  <p>Diese Daten werden nicht übertragen. Bestleistungen und Einstellungen lassen sich unter „Einstellungen → Daten auf diesem Gerät“ löschen; beim Deinstallieren der App wird alles entfernt.</p>
+
+  <h2>5. Kamera</h2>
+  <p>Zum Scannen eines QR-Codes verwendet MatheSnack auf Ihren Wunsch die Kamera. Ihr Gerät fragt dafür um Erlaubnis. Das Kamerabild wird ausschließlich auf dem Gerät ausgewertet, um den QR-Code zu erkennen, und weder gespeichert noch übertragen. Dasselbe gilt für ein Foto, das Sie über „Foto aufnehmen“ wählen. Alternativ lässt sich der Code von Hand eingeben.</p>
+
+  <h2>6. Spielcodes, QR-Codes und Links</h2>
+  <p>Ein Spielcode enthält nur Spiel, Thema, Einstellungen und eine Zufallszahl, aus der die Aufgaben entstehen – keine personenbezogenen Daten. Im QR-Code steht er hinter dem Zeichen „#“ einer Internetadresse (simaehlmann-cloud.github.io/MatheSnack/open/). Dieser Teil wird beim Öffnen technisch nicht an den Webserver übertragen. Ist MatheSnack installiert, öffnet das Gerät den Link direkt in der App. Unter iOS ruft das System dafür bei der Installation eine Freigabedatei von dieser Adresse ab; das geschieht zwischen Apple und dem Webserver, ohne Bezug zu Ihnen.</p>
+
+  <h2>7. Hinweisseite und Hosting</h2>
+  <p>Wird ein QR-Code ohne installierte App geöffnet, erscheint eine kleine Hinweisseite mit dem Weg zur App. Sie und diese Erklärung werden über GitHub Pages bereitgestellt, einen Dienst der GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Abruf verarbeitet GitHub technisch notwendige Verbindungsdaten wie die IP-Adresse, um die Seite auszuliefern und den Dienst abzusichern. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; das berechtigte Interesse liegt in der zuverlässigen Bereitstellung der Seiten. GitHub ist nach dem EU-US Data Privacy Framework zertifiziert. Einzelheiten: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</a>. Die App selbst lädt nichts von GitHub.</p>
+
+  <h2>8. Kauf des Lehrkraft-Pakets</h2>
+  <p>Das Lehrkraft-Paket wird als einmaliger In-App-Kauf über den App Store von Apple bzw. über Google Play abgewickelt. Zahlungs- und Kontodaten verarbeitet ausschließlich der jeweilige Store-Betreiber; der Anbieter erhält davon keine Kenntnis. Die App erfährt über dessen Schnittstelle (StoreKit bzw. Google Play Billing) nur, ob der Kauf besteht, und merkt sich das im lokalen Speicher. Es gelten die Datenschutzbestimmungen des jeweiligen Betreibers. Für Schülerinnen und Schüler gibt es keine Kaufangebote; im Schülergerät-Modus sind alle Kaufknöpfe ausgeblendet.</p>
+
+  <h2>9. Verbindungen ins Internet</h2>
+  <p>Die App baut von sich aus keine Netzwerkverbindungen auf – mit Ausnahme der Verbindung zum App Store bzw. zu Google Play, die das Betriebssystem für Kauf und Wiederherstellung des Lehrkraft-Pakets herstellt. Sie lädt keine Schriftarten oder Bibliotheken von Fremdservern und bettet keine fremden Inhalte ein. Die QR-Erkennung (jsQR, Apache-Lizenz 2.0) ist Teil der App.</p>
+
+  <h2>10. Bezug über einen App-Vertrieb</h2>
+  <p>Beim Herunterladen der App über einen App-Vertrieb verarbeitet dessen Betreiber eigenständig Daten (etwa Konto, Gerät und Zeitpunkt des Downloads). Darauf hat der Anbieter dieser App keinen Einfluss. Es gelten die Datenschutzbestimmungen des jeweiligen Betreibers.</p>
+
+  <h2>11. Ihre Rechte</h2>
+  <p>Ihnen stehen die Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch nach Art. 15 bis 21 DSGVO zu sowie ein Beschwerderecht bei einer Aufsichtsbehörde. Da beim Anbieter keine personenbezogenen Daten gespeichert werden, laufen Auskunfts- und Löschersuchen gegenüber dem Anbieter in der Regel ins Leere. Sie können alle Daten jederzeit selbst in der App löschen.</p>
+
+  <h2>12. Änderungen dieser Erklärung</h2>
+  <p>Diese Erklärung wird angepasst, sobald sich Funktionen der App ändern, die für den Datenschutz erheblich sind. Die jeweils gültige Fassung ist in der App abrufbar.</p>
+
+  <h2>13. Kontakt</h2>
+  <p>Bei Fragen zum Datenschutz wenden Sie sich bitte an <a href="mailto:smaehlmann.appdev@gmail.com">smaehlmann.appdev@gmail.com</a>.</p>
+  <div class="links">
+    <a class="back" href="index.html">Zurück</a>
+    <a href="impressum.html">Impressum</a>
+    <a href="datenschutz-en.html">English</a>
+  </div>
+</main>
+</body>
+</html>

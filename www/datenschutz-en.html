@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Privacy – MatheSnack</title>
+<meta name="theme-color" content="#FBF7EF">
+<script>/* Darstellung wie in der App gewählt */try{var m=JSON.parse(localStorage.getItem("mathesnack.theme"));if(m==="light"||m==="dark")document.documentElement.setAttribute("data-theme",m);}catch(e){}</script>
+<style>
+  :root { --paper:#FBF7EF; --grid:#EFE7D8; --card:#fff; --text:#1E2447; --muted:#636A8A; --ink:#2B3A9E; --line:#E3DACA; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
+  }
+  :root[data-theme="dark"] { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; padding:calc(24px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    background-color:var(--paper); color:var(--text);
+    background-image:linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:26px 26px;
+    font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height:1.6;
+  }
+  main { max-width:760px; margin:0 auto; background:var(--card); border:2px solid var(--line); border-radius:24px; padding:24px; }
+  h1 { font-size:clamp(26px,5vw,34px); margin:0 0 4px; }
+  h2 { font-size:clamp(18px,4vw,21px); margin:30px 0 8px; }
+  .stand { color:var(--muted); font-size:14px; margin:0 0 24px; }
+  address { font-style:normal; }
+  a { color:var(--ink); }
+  .links { margin-top:32px; display:flex; flex-wrap:wrap; gap:10px; }
+  .links a { display:inline-block; padding:12px 20px; border-radius:999px; text-decoration:none; font-weight:700;
+             border:2px solid var(--line); color:var(--text); background:var(--card); }
+  .links a.back { background:var(--ink); border-color:var(--ink); color:#fff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Privacy policy</h1>
+  <p class="stand">MatheSnack · Last updated: November 2026</p>
+
+  <h2>1. Controller</h2>
+  <p>The controller within the meaning of Art. 4 (7) GDPR is:</p>
+  <address>
+    Wisdompeak Apps<br>
+    Owner: Simon Mählmann<br>
+    Oderstraße 13<br>
+    28844 Weyhe<br>
+    Germany<br>
+    Email: <a href="mailto:smaehlmann.appdev@gmail.com">smaehlmann.appdev@gmail.com</a>
+  </address>
+  <p>No data protection officer has been appointed, as the requirements of Art. 37 GDPR and § 38 BDSG are not met.</p>
+
+  <h2>2. Principle: no data collection</h2>
+  <p>MatheSnack does not process personal data on the provider's servers. The app works offline. There are no user accounts, no registration, no entry of names, no analytics or tracking services, no advertising and no disclosure of data to third parties. All games are created on the device from a short game code.</p>
+
+  <h2>3. Use in class</h2>
+  <p>The teacher creates a QR code on their device; students scan it and play on their own device. No data flows between the devices and no data goes to the provider. Results are not collected; they exist only on the device in question.</p>
+
+  <h2>4. Data stored on the device</h2>
+  <p>Only the device's local storage holds:</p>
+  <ul>
+    <li>settings for language, appearance, sounds, vibration and text size</li>
+    <li>the most recently chosen settings per game (topic, duration, number)</li>
+    <li>your best score per game and topic</li>
+    <li>in the Station Rally, the letters collected</li>
+    <li>in Bingo, your own card while the app is open</li>
+    <li>whether the Teacher Pack has been purchased and how many trial starts have been used</li>
+    <li>in student device mode, the PIN chosen by the teacher</li>
+  </ul>
+  <p>This data is never transmitted. Best scores and settings can be deleted under “Settings → Data on this device”; uninstalling the app removes everything.</p>
+
+  <h2>5. Camera</h2>
+  <p>To scan a QR code, MatheSnack uses the camera at your request. Your device asks for permission first. The camera image is analysed only on the device to recognise the QR code and is neither stored nor transmitted. The same applies to a photo you choose via “Take a photo”. Alternatively, the code can be entered by hand.</p>
+
+  <h2>6. Game codes, QR codes and links</h2>
+  <p>A game code contains only the game, topic, settings and a random number from which the questions are generated – no personal data. In the QR code it follows the “#” sign of a web address (simaehlmann-cloud.github.io/MatheSnack/open/). This part is technically never sent to the web server when the link is opened. If MatheSnack is installed, the device opens the link directly in the app. On iOS, the system retrieves an approval file from this address when the app is installed; this happens between Apple and the web server without any reference to you.</p>
+
+  <h2>7. Information page and hosting</h2>
+  <p>If a QR code is opened without the app installed, a small page appears explaining how to get the app. This page and this policy are provided via GitHub Pages, a service of GitHub Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. When the page is accessed, GitHub processes technically necessary connection data such as the IP address to deliver the page and secure the service. The legal basis is Art. 6 (1) (f) GDPR; the legitimate interest lies in reliably providing the pages. GitHub is certified under the EU-US Data Privacy Framework. Details: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub privacy statement</a>. The app itself loads nothing from GitHub.</p>
+
+  <h2>8. Purchase of the Teacher Pack</h2>
+  <p>The Teacher Pack is sold as a one-time in-app purchase via Apple's App Store or Google Play. Payment and account data are processed exclusively by the respective store operator; the provider receives no knowledge of them. Through the store's interface (StoreKit or Google Play Billing) the app only learns whether the purchase exists and remembers this in local storage. The privacy terms of the respective operator apply. There are no purchase offers for students; in student device mode all purchase buttons are hidden.</p>
+
+  <h2>9. Internet connections</h2>
+  <p>The app does not establish any network connections of its own – except the connection to the App Store or Google Play that the operating system makes to purchase or restore the Teacher Pack. It does not load fonts or libraries from third-party servers and does not embed external content. QR recognition (jsQR, Apache License 2.0) is part of the app.</p>
+
+  <h2>10. Obtaining the app from an app store</h2>
+  <p>When the app is downloaded from an app store, its operator processes data independently (such as account, device and time of download). The provider of this app has no influence on this. The privacy terms of the respective operator apply.</p>
+
+  <h2>11. Your rights</h2>
+  <p>You have the rights of access, rectification, erasure, restriction of processing, data portability and objection under Art. 15 to 21 GDPR, as well as the right to lodge a complaint with a supervisory authority. As the provider stores no personal data, requests for access or erasure addressed to the provider will generally have nothing to act on. You can delete all data yourself in the app at any time.</p>
+
+  <h2>12. Changes to this policy</h2>
+  <p>This policy will be updated whenever features of the app change in ways relevant to data protection. The current version is always available in the app.</p>
+
+  <h2>13. Contact</h2>
+  <p>For questions about data protection, please contact <a href="mailto:smaehlmann.appdev@gmail.com">smaehlmann.appdev@gmail.com</a>.</p>
+  <div class="links">
+    <a class="back" href="index.html">Back</a>
+    <a href="impressum-en.html">Legal notice</a>
+    <a href="datenschutz.html">Deutsch</a>
+  </div>
+</main>
+</body>
+</html>

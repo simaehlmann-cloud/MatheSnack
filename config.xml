@@ -3,21 +3,22 @@
      Vor dem Anlegen in App Store Connect bzw. der Play Console bewusst festlegen.
      Aufbau wie bei Drawmory. -->
 <widget id="de.mathesnack.app"
-        version="0.1.0"
-        android-versionCode="100"
-        ios-CFBundleVersion="100"
+        version="0.2.0"
+        android-versionCode="200"
+        ios-CFBundleVersion="200"
         xmlns="http://www.w3.org/ns/widgets"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:cdv="http://cordova.apache.org/ns/1.0">
 
     <name>MatheSnack</name>
-    <description>Kurze Mathe-Spiele zum Stundenbeginn: Die Lehrkraft zeigt einen QR-Code, die Klasse spielt sofort. Kopfrechen-Sprint, Fehlersuche, Memory, Domino, Bingo, Schiffe versenken, Stationen-Rallye und Bewegungspausen. Ohne Konto, ohne Server, ohne Tracking.</description>
+    <description>Kurze Mathe-Spiele zum Stundenbeginn: Die Lehrkraft zeigt einen QR-Code, die Klasse spielt sofort. Kopfrechen-Sprint, Fehlersuche, Memory, Domino, Bingo, Schiffe versenken, Stationen-Rallye und Bewegungspausen. Deutsch und Englisch. Ohne Konto, ohne Server, ohne Tracking.</description>
     <author email="smaehlmann.appdev@gmail.com">Wisdompeak Apps – Simon Mählmann</author>
 
     <content src="index.html" />
 
     <!-- Kein <access origin="*">: Die App lädt keine fremden Inhalte.
-         Externe Links (Datenschutz von GitHub) gehen an den Browser. -->
+         Externe Links (Datenschutz von GitHub) gehen an den Browser.
+         www/ ist die App; docs/ ist nur die Hinweisseite auf GitHub Pages. -->
     <allow-intent href="mailto:*" />
     <allow-intent href="https://*/*" />
 
@@ -41,8 +42,16 @@
         </edit-config>
         <!-- Pflicht, sobald die Kamera genutzt wird – sonst beendet iOS die App
              beim ersten Scan. Text erscheint im Erlaubnis-Dialog. -->
+        <!-- Teilen der Stationskarten als PDF: „Bild sichern“ im Teilen-Menü
+             fragt nach dieser Erlaubnis (sonst beendet iOS die App). -->
+        <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="overwrite">
+            <string>MatheSnack sichert auf deinen Wunsch Stationskarten in deiner Fotomediathek. / MatheSnack saves station cards to your photo library when you ask it to.</string>
+        </edit-config>
+        <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="overwrite">
+            <string>MatheSnack sichert auf deinen Wunsch Stationskarten in deiner Fotomediathek; vorhandene Fotos werden nicht gelesen. / MatheSnack saves station cards to your photo library when you ask it to; existing photos are not read.</string>
+        </edit-config>
         <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="overwrite">
-            <string>MatheSnack nutzt die Kamera nur, um den QR-Code eines Spiels zu lesen. Das Bild wird auf dem Gerät ausgewertet und weder gespeichert noch übertragen.</string>
+            <string>MatheSnack nutzt die Kamera nur zum Lesen von QR-Codes; das Bild bleibt auf dem Gerät. / MatheSnack uses the camera only to read QR codes; the image stays on the device.</string>
         </edit-config>
 
         <icon src="res/ios/icon-20.png"   width="20"   height="20" />
@@ -90,6 +99,30 @@
     </platform>
 
     <plugin name="cordova-plugin-statusbar" spec="^4.0.0" />
+
+    <!-- Lehrkraft-Paket als einmaliger In-App-Kauf (wie Drawmory). Produkt-ID
+         in beiden Stores de.mathesnack.app.lehrkraft (= PRODUCT_ID in www/js/shop.js):
+         App Store Connect: "Nicht-Verbrauchsartikel". Play Console: Einmalkauf. -->
+    <plugin name="cordova-plugin-purchase" spec="^13.10.0" />
+
+    <!-- Stationskarten als PDF über das Teilen-Menü (Drucken, Dateien, AirDrop).
+         window.print() wirkt in den App-Hüllen nicht. -->
+    <plugin name="cordova-plugin-x-socialsharing" spec="^6.0.4" />
+
+    <!-- mathesnack://open#s=… öffnet die App mit einem Spiel. Die Hinweisseite
+         docs/open/ bietet diesen Link an (vor allem für Android). -->
+    <plugin name="cordova-plugin-customurlscheme" spec="^5.0.2">
+        <variable name="URL_SCHEME" value="mathesnack" />
+    </plugin>
+
+    <!-- Universal Links: Mit der Kamera gescannte QR-Codes öffnen die App direkt
+         (iOS). Eigenes Plugin, weil cordova-ios 8 diese Links nicht an
+         JavaScript weitergibt. LINK_HOST muss zu SHARE_BASE (www/js/core.js)
+         und zur Freigabedatei im Repo simaehlmann-cloud.github.io passen.
+         Der Pfad gilt relativ zum Cordova-Projekt "build" im Workflow. -->
+    <plugin name="mathesnack-links" spec="../cordova-plugins/mathesnack-links">
+        <variable name="LINK_HOST" value="simaehlmann-cloud.github.io" />
+    </plugin>
     <!-- Laufzeit-Erlaubnis für die Kamera unter Android (getUserMedia im
          WebView braucht sie; unter iOS fragt das System selbst). -->
     <plugin name="cordova-plugin-android-permissions" spec="^1.1.5" />

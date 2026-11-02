@@ -85,10 +85,9 @@ jobs:
           mkdir -p build/res/android
           cp res/android/* build/res/android/
 
+          # Die App steht vollständig in www/ (docs/ ist nur die Pages-Hinweisseite).
           rm -rf build/www/*
-          cp index.html manifest.json sw.js datenschutz.html impressum.html build/www/
-          cp icon.png icon-180.png icon-192.png icon-maskable-512.png build/www/
-          cp -r js build/www/js
+          cp -r www/. build/www/
 
           grep -o 'id="[^"]*"' build/config.xml | head -1
           grep -o '<name>[^<]*</name>' build/config.xml | head -1
@@ -118,13 +117,20 @@ jobs:
           grep -q 'android.permission.CAMERA' platforms/android/app/src/main/AndroidManifest.xml \
             && echo "CAMERA im Manifest" \
             || { echo "::error::android.permission.CAMERA fehlt im Manifest (config.xml, config-file)."; FEHLER=1; }
+          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing cordova-plugin-customurlscheme; do
+            cordova plugin ls | grep -q "^$P" && echo "Plugin $P installiert" || { echo "::error::Plugin $P fehlt."; FEHLER=1; }
+          done
+          # mathesnack://-Links (Knopf „In MatheSnack öffnen“ auf der Hinweisseite)
+          grep -q 'android:scheme="mathesnack"' platforms/android/app/src/main/AndroidManifest.xml \
+            && echo "URL-Schema mathesnack:// vorhanden" \
+            || { echo "::error::URL-Schema mathesnack fehlt im Manifest."; FEHLER=1; }
           exit $FEHLER
 
       - name: Debug-APK bauen
         working-directory: build
         run: cordova build android --debug -- --packageType=apk
 
-      - name: Kamera-Berechtigung im APK bestätigen
+      - name: Kamera- und Kauf-Berechtigung im APK bestätigen
         working-directory: build
         run: |
           set -e
@@ -133,6 +139,9 @@ jobs:
           "$AAPT2" dump permissions "$APK"
           "$AAPT2" dump permissions "$APK" | grep -q 'android.permission.CAMERA' \
             || { echo "::error::Das APK fordert die Kamera nicht an – der Scanner bliebe schwarz."; exit 1; }
+          # Ohne BILLING bliebe der Kaufknopf für das Lehrkraft-Paket wirkungslos.
+          "$AAPT2" dump permissions "$APK" | grep -q 'com.android.vending.BILLING' \
+            || { echo "::error::Das APK fordert com.android.vending.BILLING nicht an – In-App-Kauf wäre wirkungslos."; exit 1; }
           cp "$APK" "$GITHUB_WORKSPACE/MatheSnack-debug.apk"
 
       - name: Debug-APK hochladen

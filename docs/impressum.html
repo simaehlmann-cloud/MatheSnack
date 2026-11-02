@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Impressum – MatheSnack</title>
 <meta name="theme-color" content="#FBF7EF">
+<script>/* Darstellung wie in der App gewählt */try{var m=JSON.parse(localStorage.getItem("mathesnack.theme"));if(m==="light"||m==="dark")document.documentElement.setAttribute("data-theme",m);}catch(e){}</script>
 <style>
   :root { --paper:#FBF7EF; --grid:#EFE7D8; --card:#fff; --text:#1E2447; --muted:#636A8A; --ink:#2B3A9E; --line:#E3DACA; }
   @media (prefers-color-scheme: dark) {
-    :root { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
+    :root:not([data-theme="light"]) { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
   }
+  :root[data-theme="dark"] { --paper:#14182B; --grid:#1B2038; --card:#1F2541; --text:#EEF0FA; --muted:#A4AACA; --ink:#9DAAFF; --line:#2F3762; }
   * { box-sizing: border-box; }
   body {
     margin:0; padding:calc(24px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
@@ -33,7 +35,7 @@
 <body>
 <main>
   <h1>Impressum</h1>
-  <p class="stand">MatheSnack · Stand: Oktober 2026</p>
+  <p class="stand">MatheSnack · Stand: November 2026</p>
 
   <h2>Angaben gemäß § 5 DDG</h2>
   <address>
@@ -66,8 +68,9 @@
   <h2>Urheberrecht und Lizenzen</h2>
   <p>Die durch den Anbieter erstellten Inhalte, Aufgaben und Spiele dieser App unterliegen dem deutschen Urheberrecht. Die QR-Erkennung nutzt jsQR von Cosmo Wolfe unter der Apache-Lizenz 2.0 (<a href="js/jsqr-LICENSE.txt">Lizenztext</a>). Die QR-Erzeugung ist angelehnt an die QR Code generator library von Project Nayuki (MIT-Lizenz).</p>
   <div class="links">
-    <a class="back" href="index.html">Zurück zur App</a>
-    <a href="datenschutz.html">Datenschutzerklärung</a>
+    <a class="back" href="index.html">Zurück</a>
+    <a href="datenschutz.html">Datenschutz</a>
+    <a href="impressum-en.html">English</a>
   </div>
 </main>
 </body>

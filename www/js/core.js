@@ -3,20 +3,17 @@
    Einstellungen, Zufallssamen). Kein Server, keine Konten, keine Analyse. */
 "use strict";
 
-const APP_VERSION = "0.1.0";
+const APP_VERSION = "0.2.0";
 
-/* Ziel der QR-Codes, wenn die App sie in der nativen Hülle erzeugt.
-   In der Webfassung gilt automatisch die Adresse, unter der sie läuft. */
-const APP_BASE_NATIVE = "https://simaehlmann-cloud.github.io/MatheSnack/";
+/* Ziel der QR-Codes. Ist MatheSnack installiert, öffnet die Kamera den Link
+   direkt in der App (iOS: Universal Link, Plugin mathesnack-links).
+   Sonst zeigt die Seite docs/open/ einen Hinweis auf die kostenlose App –
+   gespielt wird dort nicht. LINK_HOST in config.xml muss zur Domain passen. */
+const SHARE_BASE = "https://simaehlmann-cloud.github.io/MatheSnack/open/";
+const URL_SCHEME = "mathesnack";
 
 function inApp() { return !!window.cordova; }
 function onAndroid() { return !!(window.cordova && window.cordova.platformId === "android"); }
-function appBase() {
-  if (!inApp() && /^https?:$/.test(location.protocol)) {
-    return location.origin + location.pathname.replace(/index\.html$/, "");
-  }
-  return APP_BASE_NATIVE;
-}
 
 /* ---------- Zufall mit Samen (mulberry32) ----------
    Gleicher Samen = gleiche Aufgaben auf jedem Gerät. */
@@ -113,9 +110,12 @@ function decodeCode(text) {
   return cfg;
 }
 function codeGroups(code) { return code.replace(/(.{5})(?=.)/g, "$1-"); }
-function shareUrl(cfg) { return appBase() + "#s=" + encodeCode(cfg); }
+function shareUrl(cfg) { return SHARE_BASE + "#s=" + encodeCode(cfg); }
 
-/* ---------- Zahlen und Terme schön schreiben ---------- */
+/* ---------- Zahlen und Terme schön schreiben ----------
+   Dezimaltrennzeichen und Rechenzeichen hängen von der Sprache ab
+   (js/i18n.js: 2,5 · 3 bzw. 2.5 × 3). Die Aufgaben selbst sind in beiden
+   Sprachen dieselben – nur die Schreibweise unterscheidet sich. */
 const MINUS = "−";
 function num(n) {
   if (!Number.isFinite(n)) return "?";
@@ -124,8 +124,8 @@ function num(n) {
   let s = Math.abs(r).toString();
   if (s.includes("e")) s = Math.abs(r).toFixed(0);
   const [int, dec] = s.split(".");
-  const grouped = int.length > 4 ? int.replace(/\B(?=(\d{3})+(?!\d))/g, " ") : int;
-  return (neg ? MINUS : "") + grouped + (dec ? "," + dec : "");
+  const grouped = int.length > 4 ? int.replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F") : int;
+  return (neg ? MINUS : "") + grouped + (dec ? NOTE.dec() + dec : "");
 }
 /* Zahl in Klammern, wenn negativ: 3 · (−4) */
 function numP(n) { return n < 0 ? "(" + num(n) + ")" : num(n); }
@@ -209,7 +209,34 @@ function fmtTime(sec) {
   sec = Math.max(0, Math.ceil(sec));
   return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
 }
-function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* egal */ } }
+function vibrate(ms) {
+  if (!store.get("vibrate", true)) return;
+  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* egal */ }
+}
+
+/* Kurze Töne über Web Audio, ohne Audiodateien. Abschaltbar in den
+   Einstellungen. "ok" und "bad" bei Antworten, "gong" bei Zeitablauf am Beamer. */
+let audioCtx = null;
+function sfx(kind) {
+  if (!store.get("sound", true)) return;
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    const now = audioCtx.currentTime;
+    const notes = { ok: [[880, 0, .09], [1320, .07, .12]], bad: [[220, 0, .18]], gong: [[523, 0, 1.1], [659, 0, 1.1], [784, 0, 1.1]], tick: [[1000, 0, .04]] }[kind] || [];
+    notes.forEach(([f, t0, d]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = kind === "bad" ? "triangle" : "sine";
+      o.frequency.value = f;
+      const vol = kind === "gong" ? .18 : .08;
+      g.gain.setValueAtTime(0.0001, now + t0);
+      g.gain.exponentialRampToValueAtTime(vol, now + t0 + .01);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + t0 + d);
+      o.connect(g).connect(audioCtx.destination);
+      o.start(now + t0); o.stop(now + t0 + d + .05);
+    });
+  } catch (e) { /* ohne Ton weiter */ }
+}
 
 /* Bildschirm wach halten (Beamer, Bewegungspause). Fehlt die Funktion, egal. */
 let wakeLock = null;

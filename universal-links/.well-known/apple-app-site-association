@@ -1,0 +1,29 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["7LPBMXVK6D.de.drawmory.app"],
+        "components": [
+          {
+            "/": "/Drawmory/open/*",
+            "comment": "QR-Codes und geteilte Links ab Drawmory 0.3"
+          },
+          {
+            "/": "/Drawmory/",
+            "#": "t=*",
+            "comment": "Links aus Drawmory 0.2 (Vorlage im Teil hinter #)"
+          }
+        ]
+      },
+      {
+        "appIDs": ["7LPBMXVK6D.de.mathesnack.app"],
+        "components": [
+          {
+            "/": "/MatheSnack/open/*",
+            "comment": "QR-Codes von MatheSnack (Spielcode im Teil hinter #)"
+          }
+        ]
+      }
+    ]
+  }
+}

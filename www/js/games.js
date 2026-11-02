@@ -4,48 +4,43 @@
      root     Element, in das das Spiel zeichnet
      items    (n, opt) -> Aufgaben aus Thema und Samen
      finish   (ergebnis) -> Ergebnisbildschirm
-     onLeave  (fn) -> Aufräumen beim Verlassen (Zeitgeber anhalten) */
+     onLeave  (fn) -> Aufräumen beim Verlassen (Zeitgeber anhalten)
+   Alle Texte kommen aus js/i18n.js (t("…")). */
 "use strict";
 
+/* free: Für die Klasse ohne Lehrkraft-Paket nutzbar (QR-Code, Beamer).
+   Spielen per Code und „Selbst üben“ sind immer frei. */
+function game(key, icon, color, spec) {
+  return Object.assign({
+    key, icon, color,
+    get name() { return t("g." + key); },
+    get desc() { return t("g." + key + ".desc"); }
+  }, spec);
+}
+function setting(labelKey, values, fmt, def) {
+  return { get label() { return t(labelKey); }, values, fmt, def };
+}
 const GAMES = [
-  { key: "sprint", name: "Kopfrechen-Sprint", icon: "⚡", color: "amber",
-    desc: "So viele Aufgaben wie möglich, bevor die Zeit abläuft.",
-    a: { label: "Zeit", values: [60, 90, 120, 180], fmt: v => v + " Sekunden", def: 1 },
-    graph: true, student: true, play: playSprint },
-  { key: "fehler", name: "Fehlersuche", icon: "🔍", color: "rose",
-    desc: "Sechs Rechnungen – welche sind falsch?",
-    a: { label: "Runden", values: [3, 5, 8], fmt: v => v + " Runden", def: 1 },
-    graph: true, student: true, play: playFehler },
-  { key: "memory", name: "Memory", icon: "🃏", color: "violet",
-    desc: "Aufgabe und Ergebnis als Paar finden.",
-    a: { label: "Paare", values: [6, 8, 10], fmt: v => v + " Paare", def: 0 },
-    graph: true, student: true, play: playMemory },
-  { key: "domino", name: "Domino", icon: "🁫", color: "teal",
-    desc: "Lege die Kette: Ergebnis an Aufgabe, vom Start bis ins Ziel.",
-    a: { label: "Steine", values: [8, 10, 12, 15], fmt: v => v + " Steine", def: 1 },
-    graph: true, student: true, play: playDomino },
-  { key: "zuordnen", name: "Zuordnen", icon: "🔗", color: "blue",
-    desc: "Je vier Paare verbinden – auch Graph und Gleichung.",
-    a: { label: "Runden", values: [3, 5, 8], fmt: v => v + " Runden", def: 1 },
-    graph: true, student: true, play: playZuordnen },
-  { key: "bingo", name: "Kopfrechen-Bingo", icon: "🎯", color: "green",
-    desc: "Der Beamer zeigt Aufgaben, jede Karte ist anders. Wer hat zuerst eine Reihe?",
-    a: { label: "Karte", values: [3, 4], fmt: v => v + " × " + v, def: 1 },
-    graph: false, student: true, leader: true, play: playBingo },
-  { key: "schiffe", name: "Schiffe versenken", icon: "🚢", color: "blue",
-    desc: "Koordinaten ansagen, eintragen, treffen.",
-    a: { label: "Koordinatensystem", values: [0, 1], fmt: v => ["−5 bis 5 (alle Quadranten)", "0 bis 10 (1. Quadrant)"][v], def: 0 },
-    b: { label: "Spielform", values: [0, 1, 2], fmt: v => ["Klasse gegen Lehrkraft (Beamer)", "Allein gegen die App", "Partnerspiel mit zwei Geräten"][v], def: 0 },
-    noTopic: true, student: true, play: playSchiffe },
-  { key: "rallye", name: "Stationen-Rallye", icon: "🏃", color: "orange",
-    desc: "QR-Karten im Raum verteilen. Jede Station liefert einen Buchstaben des Lösungsworts.",
-    a: { label: "Stationen", values: [5, 6, 8, 10], fmt: v => v + " Stationen", def: 1 },
-    graph: true, student: true, play: playRallye },
-  { key: "move", name: "Move & Brain", icon: "🤸", color: "green",
-    desc: "Bewegungspause am Beamer: Aufstehen bei wahr, Arm heben bei größer.",
-    a: { label: "Dauer", values: [2, 3, 5], fmt: v => v + " Minuten", def: 0 },
-    b: { label: "Bewegung", values: [0, 1, 2], fmt: v => ["Wahr oder falsch? (aufstehen/sitzen)", "Was ist mehr? (linker/rechter Arm)", "Mix mit Bewegungsimpulsen"][v], def: 0 },
-    graph: false, beamerOnly: true, play: playMove }
+  game("sprint", "⚡", "amber", { free: true, graph: true, play: playSprint,
+    a: setting("set.time", [60, 90, 120, 180], v => t("unit.seconds", { n: v }), 1) }),
+  game("fehler", "🔍", "rose", { free: true, graph: true, play: playFehler,
+    a: setting("set.rounds", [3, 5, 8], v => t("unit.rounds", { n: v }), 1) }),
+  game("memory", "🃏", "violet", { free: true, graph: true, play: playMemory,
+    a: setting("set.pairs", [6, 8, 10], v => t("unit.pairs", { n: v }), 0) }),
+  game("domino", "🁫", "teal", { graph: true, play: playDomino,
+    a: setting("set.stones", [8, 10, 12, 15], v => t("unit.stones", { n: v }), 1) }),
+  game("zuordnen", "🔗", "blue", { graph: true, play: playZuordnen,
+    a: setting("set.rounds", [3, 5, 8], v => t("unit.rounds", { n: v }), 1) }),
+  game("bingo", "🎯", "green", { graph: false, leader: true, play: playBingo,
+    a: setting("set.card", [3, 4], v => v + " × " + v, 1) }),
+  game("schiffe", "🚢", "blue", { noTopic: true, play: playSchiffe,
+    a: setting("set.grid", [0, 1], v => t(["set.grid.all", "set.grid.q1"][v]), 0),
+    b: setting("set.mode", [0, 1, 2], v => t(["set.mode.beamer", "set.mode.solo", "set.mode.partner"][v]), 0) }),
+  game("rallye", "🏃", "orange", { graph: true, noSelf: true, play: playRallye,
+    a: setting("set.stations", [5, 6, 8, 10], v => t("unit.stations", { n: v }), 1) }),
+  game("move", "🤸", "green", { graph: false, beamerOnly: true, noSelf: true, play: playMove,
+    a: setting("set.duration", [2, 3, 5], v => t("unit.minutes", { n: v }), 0),
+    b: setting("set.motion", [0, 1, 2], v => t(["set.motion.tf", "set.motion.cmp", "set.motion.mix"][v]), 0) })
 ];
 
 function validConfig(cfg) {
@@ -58,14 +53,6 @@ function validConfig(cfg) {
   return true;
 }
 function gameSetting(cfg, which = "a") { const g = GAMES[cfg.g]; return g[which] ? g[which].values[cfg[which]] : 0; }
-function cfgLabel(cfg) {
-  const g = GAMES[cfg.g];
-  const parts = [g.name];
-  if (!g.noTopic) parts.push(TOPICS[cfg.t].name);
-  parts.push(g.a.fmt(gameSetting(cfg, "a")));
-  if (g.b && g.key !== "rallye") parts.push(g.b.fmt(gameSetting(cfg, "b")));
-  return parts.join(" · ");
-}
 
 /* ---------- gemeinsame Bausteine ---------- */
 function answerFace(text) { return h("span", { class: "face-text" }, text); }
@@ -75,8 +62,8 @@ function statementFace(it, answer) {
 }
 function hud(...pills) { return h("div", { class: "hud" }, pills); }
 function pill(text, cls) { return h("span", { class: "pill " + (cls || "") }, text); }
-function countdownThen(root, label, fn) {
-  let n = 3;
+function countdownThen(root, label, fn, onLeave) {
+  let n = 3, timer = null;
   const big = h("div", { class: "countdown" }, "3");
   root.replaceChildren(h("div", { class: "center-stage" }, h("p", { class: "muted" }, label), big));
   const tick = () => {
@@ -84,9 +71,12 @@ function countdownThen(root, label, fn) {
     if (n <= 0) { fn(); return; }
     big.textContent = String(n);
     big.classList.remove("pop"); void big.offsetWidth; big.classList.add("pop");
-    setTimeout(tick, 650);
+    sfx("tick");
+    timer = setTimeout(tick, 650);
   };
-  setTimeout(tick, 650);
+  sfx("tick");
+  timer = setTimeout(tick, 650);
+  if (onLeave) onLeave(() => clearTimeout(timer));
 }
 function readyScreen(ctx, intro, onGo) {
   const g = GAMES[ctx.cfg.g];
@@ -95,8 +85,9 @@ function readyScreen(ctx, intro, onGo) {
     h("h2", null, g.name),
     g.noTopic ? null : h("p", { class: "topic-line" }, TOPICS[ctx.cfg.t].name),
     h("p", { class: "muted intro" }, intro),
-    h("button", { class: "btn primary xl", type: "button", onclick: onGo }, "Los geht's")));
+    h("button", { class: "btn primary xl", type: "button", onclick: onGo }, t("go"))));
 }
+function promptTail(it) { return !it.fn && it.expr ? h("span", { class: "eq-tail" }, " = ?") : null; }
 
 /* =====================================================================
    Kopfrechen-Sprint
@@ -120,7 +111,7 @@ function playSprint(ctx) {
   function next() {
     if (i >= order.length) { order = r.shuffle(items); i = 0; }
     const it = order[i++];
-    prompt.replaceChildren(...[promptFace(it), !it.fn && it.expr ? h("span", { class: "eq-tail" }, " = ?") : null].filter(Boolean));
+    prompt.replaceChildren(...[promptFace(it), promptTail(it)].filter(Boolean));
     prompt.classList.toggle("is-graph", !!it.fn);
     const choices = r.shuffle([it.a, ...it.wrong]);
     opts.replaceChildren(...choices.map(c => h("button", { class: "opt", type: "button", onclick: e => pick(e.currentTarget, c, it) }, c)));
@@ -132,10 +123,11 @@ function playSprint(ctx) {
     if (c === it.a) {
       score++; streak++; best = Math.max(best, streak);
       btn.classList.add("right");
+      sfx("ok");
       updateHud();
       setTimeout(next, 220);
     } else {
-      wrongN++; streak = 0; vibrate(60);
+      wrongN++; streak = 0; vibrate(60); sfx("bad");
       btn.classList.add("wrong");
       [...opts.children].forEach(b => { if (b.textContent === it.a) b.classList.add("right"); });
       updateHud();
@@ -149,18 +141,19 @@ function playSprint(ctx) {
     bar.classList.toggle("late", left < 10);
     if (left <= 0) {
       clearInterval(timer); end = 0;
-      ctx.finish({ big: score, unit: score === 1 ? "Aufgabe richtig" : "Aufgaben richtig",
-        lines: [`${wrongN} falsch`, `beste Serie: ${best}`], record: { key: "sprint", value: score } });
+      sfx("gong");
+      ctx.finish({ big: score, unit: t("res.sprint.unit", { n: score }),
+        lines: [t("res.sprint.wrong", { n: wrongN }), t("res.sprint.streak", { n: best })], record: { key: "sprint", value: score } });
     }
   }
   ctx.onLeave(() => clearInterval(timer));
-  readyScreen(ctx, `${dur} Sekunden. Tippe die richtige Antwort an. Fehler kosten etwas Zeit.`, () =>
-    countdownThen(ctx.root, "Gleich geht's los …", () => {
+  readyScreen(ctx, t("g.sprint.intro", { n: dur }), () =>
+    countdownThen(ctx.root, t("getReady"), () => {
       ctx.root.replaceChildren(stage);
       end = Date.now() + dur * 1000;
       updateHud(); next(); tick();
       timer = setInterval(tick, 200);
-    }));
+    }, ctx.onLeave));
 }
 
 /* =====================================================================
@@ -193,33 +186,35 @@ function playFehler(ctx) {
       });
       return { card, it, isWrong };
     });
-    const btn = h("button", { class: "btn primary", type: "button" }, "Prüfen");
-    const info = h("p", { class: "muted center" }, "Tippe alle falschen Rechnungen an. Es sind mindestens eine und höchstens drei.");
+    const btn = h("button", { class: "btn primary", type: "button" }, t("fehler.check"));
+    const info = h("p", { class: "muted center" }, t("fehler.howto"));
+    const scorePill = pill(`✓ ${points}`, "good");
     btn.addEventListener("click", () => {
       if (!checked) {
         checked = true;
+        let roundOk = 0;
         cards.forEach((c, k) => {
           const m = marked.has(k);
           total++;
-          if (m === c.isWrong) points++;
+          if (m === c.isWrong) { points++; roundOk++; }
           c.card.classList.add(c.isWrong ? (m ? "found" : "missed") : (m ? "falsealarm" : "ok"));
-          if (c.isWrong) c.card.append(h("span", { class: "stmt-fix" }, "richtig: " + c.it.a));
+          if (c.isWrong) c.card.append(h("span", { class: "stmt-fix" }, t("fehler.correct", { a: c.it.a })));
         });
+        sfx(roundOk === 6 ? "ok" : "bad");
         scorePill.textContent = `✓ ${points}`;
-        btn.textContent = round + 1 < rounds ? "Nächste Runde" : "Ergebnis";
-        info.textContent = "Grün: richtig erkannt · Orange: übersehen · Grau durchgestrichen: war doch richtig";
+        btn.textContent = round + 1 < rounds ? t("nextRound") : t("showResult");
+        info.textContent = t("fehler.legend");
       } else {
         round++;
         if (round < rounds) playRound();
-        else ctx.finish({ big: points + " / " + total, unit: "richtig eingeschätzt", lines: [`${rounds} Runden`], record: { key: "fehler", value: Math.round(points / total * 100) } });
+        else ctx.finish({ big: points + " / " + total, unit: t("res.fehler.unit"), lines: [t("unit.rounds", { n: rounds })], record: { key: "fehler", value: Math.round(points / total * 100), pct: true } });
       }
     });
-    const scorePill = pill(`✓ ${points}`, "good");
     ctx.root.replaceChildren(h("div", { class: "game" },
-      hud(pill(`Runde ${round + 1} / ${rounds}`), scorePill),
+      hud(pill(t("roundOf", { n: round + 1, m: rounds })), scorePill),
       info, h("div", { class: "stmts" }, cards.map(c => c.card)), h("div", { class: "center" }, btn)));
   }
-  readyScreen(ctx, "Prüfe sechs Rechnungen. Markiere die falschen – dann zeigt die App die richtigen Ergebnisse.", playRound);
+  readyScreen(ctx, t("g.fehler.intro"), playRound);
 }
 
 /* =====================================================================
@@ -231,11 +226,11 @@ function playMemory(ctx) {
   const r = deviceRng();
   const cards = r.shuffle(items.flatMap((it, k) => [{ k, side: "q", it }, { k, side: "a", it }]));
   let open = [], moves = 0, found = 0, lock = false, t0 = 0;
-  const movesEl = pill("Züge: 0"), foundEl = pill(`Paare: 0 / ${items.length}`, "good");
+  const movesEl = pill(t("memory.moves", { n: 0 })), foundEl = pill(t("memory.pairs", { n: 0, m: items.length }), "good");
   const grid = h("div", { class: "memory cols-" + (cards.length > 16 ? 5 : 4) });
   cards.forEach(c => {
     const face = c.side === "q" ? promptFace(c.it) : answerFace(c.it.a);
-    const el = h("button", { class: "mcard side-" + c.side, type: "button", "aria-label": "verdeckte Karte" },
+    const el = h("button", { class: "mcard side-" + c.side, type: "button", "aria-label": t("memory.hidden") },
       h("span", { class: "mback", "aria-hidden": "true" }, "?"), h("span", { class: "mface" }, face));
     el.addEventListener("click", () => flip(c, el));
     c.el = el;
@@ -245,28 +240,29 @@ function playMemory(ctx) {
     if (lock || el.classList.contains("up") || el.classList.contains("done")) return;
     if (!t0) t0 = Date.now();
     el.classList.add("up");
-    el.setAttribute("aria-label", c.side === "q" ? "Aufgabe" : "Ergebnis");
+    el.setAttribute("aria-label", c.side === "q" ? t("memory.task") : t("memory.result"));
     open.push(c);
     if (open.length < 2) return;
     moves++;
-    movesEl.textContent = "Züge: " + moves;
+    movesEl.textContent = t("memory.moves", { n: moves });
     const [x, y] = open;
     open = [];
     if (x.k === y.k && x.side !== y.side) {
       found++;
-      foundEl.textContent = `Paare: ${found} / ${items.length}`;
+      sfx("ok");
+      foundEl.textContent = t("memory.pairs", { n: found, m: items.length });
       setTimeout(() => { x.el.classList.add("done"); y.el.classList.add("done"); }, 300);
-      if (found === items.length) setTimeout(() => ctx.finish({ big: moves, unit: "Züge", lines: [`${items.length} Paare in ${fmtTime((Date.now() - t0) / 1000)} min`, `bestmöglich: ${items.length} Züge`] }), 900);
+      if (found === items.length) setTimeout(() => ctx.finish({ big: moves, unit: t("res.memory.unit", { n: moves }), lines: [t("res.memory.time", { n: items.length, t: fmtTime((Date.now() - t0) / 1000) }), t("res.memory.best", { n: items.length })] }), 900);
     } else {
       lock = true;
       setTimeout(() => {
-        [x, y].forEach(c2 => { c2.el.classList.remove("up"); c2.el.setAttribute("aria-label", "verdeckte Karte"); });
+        [x, y].forEach(c2 => { c2.el.classList.remove("up"); c2.el.setAttribute("aria-label", t("memory.hidden")); });
         lock = false;
       }, 1300);
     }
   }
   ctx.root.replaceChildren(h("div", { class: "game" }, hud(movesEl, foundEl),
-    h("p", { class: "muted center small" }, "Blau: Aufgabe · Orange: Ergebnis"), grid));
+    h("p", { class: "muted center small" }, t("memory.legend")), grid));
 }
 
 /* =====================================================================
@@ -280,22 +276,22 @@ function playDomino(ctx) {
   const stones = [];
   for (let i = 0; i <= N; i++) stones.push({ i, left: i === 0 ? null : items[i - 1], right: i === N ? null : items[i] });
   const stoneEl = (st, small) => h("div", { class: "stone" + (small ? " small" : "") },
-    h("div", { class: "half left" }, st.left ? answerFace(st.left.a) : h("span", { class: "flag" }, "START")),
-    h("div", { class: "half right" }, st.right ? promptFace(st.right) : h("span", { class: "flag" }, "ZIEL 🏁")));
+    h("div", { class: "half left" }, st.left ? answerFace(st.left.a) : h("span", { class: "flag" }, t("domino.start"))),
+    h("div", { class: "half right" }, st.right ? promptFace(st.right) : h("span", { class: "flag" }, t("domino.goal") + " 🏁")));
   const r = deviceRng();
   let placed = 1, errors = 0;
   const t0 = Date.now();
   const chain = h("div", { class: "chain" });
   const pool = h("div", { class: "pool" });
-  const errEl = pill("Fehlversuche: 0"), progEl = pill("");
-  const info = h("p", { class: "muted center small" }, "Welcher Stein beginnt mit dem Ergebnis der offenen Aufgabe?");
+  const errEl = pill(t("domino.errors", { n: 0 })), progEl = pill("");
+  const info = h("p", { class: "muted center small" }, t("domino.howto"));
   function render() {
     chain.replaceChildren(...stones.slice(Math.max(0, placed - 2), placed).map((st, k, arr) => {
       const el = stoneEl(st, k < arr.length - 1);
       if (k === arr.length - 1) el.classList.add("current");
       return el;
     }));
-    progEl.textContent = `Steine: ${placed - 1} / ${N}`;
+    progEl.textContent = t("domino.progress", { n: placed - 1, m: N });
   }
   const order = r.shuffle(stones.slice(1));
   order.forEach(st => {
@@ -304,11 +300,12 @@ function playDomino(ctx) {
       if (st.i === placed) {
         el.remove();
         placed++;
+        sfx("ok");
         render();
-        if (placed > N) ctx.finish({ big: errors, unit: errors === 1 ? "Fehlversuch" : "Fehlversuche", lines: [`${N} Steine in ${fmtTime((Date.now() - t0) / 1000)} min`] });
+        if (placed > N) ctx.finish({ big: errors, unit: t("res.domino.unit", { n: errors }), lines: [t("res.domino.time", { n: N, t: fmtTime((Date.now() - t0) / 1000) })] });
       } else {
-        errors++; vibrate(60);
-        errEl.textContent = "Fehlversuche: " + errors;
+        errors++; vibrate(60); sfx("bad");
+        errEl.textContent = t("domino.errors", { n: errors });
         el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
       }
     });
@@ -333,6 +330,7 @@ function playZuordnen(ctx) {
     for (let k = 0; k < 4; k++) set.push(items[(round * 4 + k) % items.length]);
     let sel = null, done = 0;
     const left = h("div", { class: "col" }), right = h("div", { class: "col" });
+    const errPill = pill(t("zuordnen.errors", { n: errors }));
     const lefts = set.map((it, k) => {
       const el = h("button", { class: "pairbtn", type: "button" }, promptFace(it));
       el.addEventListener("click", () => {
@@ -345,20 +343,23 @@ function playZuordnen(ctx) {
     r.shuffle(set.map((it, k) => k)).forEach(k => {
       const el = h("button", { class: "pairbtn ans", type: "button" }, answerFace(set[k].a));
       el.addEventListener("click", () => {
-        if (el.disabled || sel === null) { if (sel === null) toast("Wähle zuerst links eine Aufgabe."); return; }
+        if (el.disabled) return;
+        if (sel === null) { toast(t("zuordnen.pickLeft")); return; }
         if (sel === k) {
           const c = COLORS[done];
           lefts[k].classList.remove("sel");
           lefts[k].classList.add("matched", c); el.classList.add("matched", c);
           lefts[k].disabled = true; el.disabled = true;
           sel = null; done++;
+          sfx("ok");
           if (done === 4) setTimeout(() => {
             round++;
             if (round < rounds) playRound();
-            else ctx.finish({ big: errors, unit: errors === 1 ? "Fehler" : "Fehler", lines: [`${rounds * 4} Paare in ${fmtTime((Date.now() - t0) / 1000)} min`] });
+            else ctx.finish({ big: errors, unit: t("res.zuordnen.unit", { n: errors }), lines: [t("res.zuordnen.time", { n: rounds * 4, t: fmtTime((Date.now() - t0) / 1000) })] });
           }, 700);
         } else {
-          errors++; vibrate(60);
+          errors++; vibrate(60); sfx("bad");
+          errPill.textContent = t("zuordnen.errors", { n: errors });
           el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
         }
       });
@@ -366,8 +367,8 @@ function playZuordnen(ctx) {
     });
     left.append(...lefts);
     ctx.root.replaceChildren(h("div", { class: "game" },
-      hud(pill(`Runde ${round + 1} / ${rounds}`), pill(`Fehler: ${errors}`)),
-      h("p", { class: "muted center small" }, "Tippe links eine Aufgabe, dann rechts das passende Ergebnis."),
+      hud(pill(t("roundOf", { n: round + 1, m: rounds })), errPill),
+      h("p", { class: "muted center small" }, t("zuordnen.howto")),
       h("div", { class: "pairs" }, left, right)));
   }
   playRound();
@@ -387,15 +388,18 @@ function playBingo(ctx) {
   const { size, pool, calls } = bingoSetup(ctx.cfg);
   const cells = size * size;
   if (pool.length < cells) {
-    ctx.root.replaceChildren(h("div", { class: "center-stage" }, h("p", null, "Dieses Thema hat zu wenige verschiedene Ergebnisse für eine Bingo-Karte. Bitte ein anderes Thema wählen.")));
+    ctx.root.replaceChildren(h("div", { class: "center-stage" }, h("p", null, t("bingo.tooFew"))));
     return;
   }
-  /* eigene Karte: Gerätezufall, gemerkt für diese Sitzung (versehentliches Neuladen) */
+  /* eigene Karte: Gerätezufall, gemerkt für diese Sitzung (versehentliches Neuladen).
+     Gespeichert werden Positionen im Aufgabenpool, nicht Texte – so passt die
+     Karte auch nach einem Sprachwechsel. */
   const key = "bingo." + encodeCode(ctx.cfg);
   let saved = null;
   try { saved = JSON.parse(sessionStorage.getItem(key) || "null"); } catch (e) { saved = null; }
-  let card = saved && Array.isArray(saved.card) && saved.card.length === cells ? saved.card : deviceRng().shuffle(pool.map((_, k) => k)).slice(0, cells);
-  let marks = new Set(saved && Array.isArray(saved.marks) ? saved.marks : []);
+  const validSaved = saved && Array.isArray(saved.card) && saved.card.length === cells && saved.card.every(i => Number.isInteger(i) && i >= 0 && i < pool.length);
+  let card = validSaved ? saved.card : deviceRng().shuffle(pool.map((_, k) => k)).slice(0, cells);
+  let marks = new Set(validSaved && Array.isArray(saved.marks) ? saved.marks.filter(i => Number.isInteger(i) && i >= 0 && i < cells) : []);
   let solo = false, soloCount = 0;
   const persist = () => { try { sessionStorage.setItem(key, JSON.stringify({ card, marks: [...marks] })); } catch (e) { /* egal */ } };
   persist();
@@ -423,22 +427,22 @@ function playBingo(ctx) {
   const soloBox = h("div", { class: "solo-call", hidden: true });
   const soloPrompt = h("div", { class: "prompt small" });
   const soloNr = pill("");
-  const soloNext = h("button", { class: "btn", type: "button" }, "Nächste Aufgabe ›");
+  const soloNext = h("button", { class: "btn", type: "button" }, t("bingo.next"));
   soloNext.addEventListener("click", () => {
-    if (soloCount >= calls.length) { toast("Alle Aufgaben gezogen."); return; }
+    if (soloCount >= calls.length) { toast(t("bingo.allDrawn")); return; }
     soloCount++; showSolo();
   });
   soloBox.append(soloNr, soloPrompt, soloNext);
   function showSolo() {
     const it = calls[soloCount - 1];
-    soloNr.textContent = `Aufgabe ${soloCount} von ${calls.length}`;
+    soloNr.textContent = t("bingo.callOf", { n: soloCount, m: calls.length });
     soloPrompt.replaceChildren(h("span", { class: "face-text" }, it.q + (it.expr ? " = ?" : "")));
   }
-  const soloBtn = h("button", { class: "btn ghost small", type: "button" }, "Ohne Beamer spielen");
+  const soloBtn = h("button", { class: "btn ghost small", type: "button" }, t("bingo.solo"));
   soloBtn.addEventListener("click", () => {
     solo = !solo;
     soloBox.hidden = !solo;
-    soloBtn.textContent = solo ? "Mit Beamer spielen" : "Ohne Beamer spielen";
+    soloBtn.textContent = solo ? t("bingo.withBeamer") : t("bingo.solo");
     if (solo && soloCount === 0) { soloCount = 1; showSolo(); }
   });
 
@@ -456,30 +460,32 @@ function playBingo(ctx) {
     const bad = [...marks].filter(ci => !called.has(pool[card[ci]].a));
     paint(win, bad);
     if (win) {
-      dialog("🎉 BINGO!", "Deine Reihe stimmt. Zeig dein Gerät der Lehrkraft.", [{ label: "Super", primary: true }]);
+      sfx("gong");
+      dialog(t("bingo.win.title"), t("bingo.win.text"), [{ label: t("great"), primary: true }]);
     } else if (bad.length) {
-      dialog("Noch kein Bingo", `${bad.length === 1 ? "Ein markiertes Feld passt" : bad.length + " markierte Felder passen"} zu keiner der ersten ${k} Aufgaben (rot). Prüfe sie noch einmal.`, [{ label: "OK", primary: true }]);
+      sfx("bad");
+      dialog(t("bingo.no.title"), t("bingo.no.bad", { n: bad.length, k }), [{ label: t("ok"), primary: true }]);
     } else {
-      dialog("Noch kein Bingo", "Deine Markierungen stimmen, aber eine vollständige Reihe fehlt noch.", [{ label: "Weiter", primary: true }]);
+      dialog(t("bingo.no.title"), t("bingo.no.line"), [{ label: t("continue"), primary: true }]);
     }
   }
-  const bingoBtn = h("button", { class: "btn primary xl", type: "button" }, "BINGO!");
+  const bingoBtn = h("button", { class: "btn primary xl", type: "button" }, t("bingo.button"));
   bingoBtn.addEventListener("click", () => {
     if (solo) { check(soloCount); return; }
-    const inp = h("input", { type: "number", inputmode: "numeric", min: 1, max: calls.length, class: "numinput", "aria-label": "Nummer der aktuellen Aufgabe" });
-    dialog("Bingo prüfen", h("div", null, h("p", null, "Welche Nummer hat die Aufgabe, die gerade am Beamer steht?"), inp), [
-      { label: "Abbrechen" },
-      { label: "Prüfen", primary: true, action: () => {
+    const inp = h("input", { type: "number", inputmode: "numeric", min: 1, max: calls.length, class: "numinput", "aria-label": t("bingo.ask.aria") });
+    dialog(t("bingo.ask.title"), h("div", null, h("p", null, t("bingo.ask.text")), inp), [
+      { label: t("cancel") },
+      { label: t("bingo.ask.check"), primary: true, action: () => {
         const k = Math.round(Number(inp.value));
-        if (!(k >= 1 && k <= calls.length)) { toast(`Bitte eine Zahl von 1 bis ${calls.length} eingeben.`); return false; }
+        if (!(k >= 1 && k <= calls.length)) { toast(t("bingo.ask.range", { m: calls.length })); return false; }
         setTimeout(() => check(k), 50);
       } }
     ]);
     setTimeout(() => inp.focus(), 100);
   });
-  const newCard = h("button", { class: "btn ghost small", type: "button" }, "Neue Karte");
+  const newCard = h("button", { class: "btn ghost small", type: "button" }, t("bingo.newCard"));
   newCard.addEventListener("click", () => {
-    confirmDialog("Neue Karte ziehen? Deine Markierungen gehen verloren.", () => {
+    confirmDialog(t("bingo.newCard.confirm"), () => {
       card = deviceRng().shuffle(pool.map((_, k) => k)).slice(0, cells);
       marks = new Set();
       cellEls.forEach((el, ci) => { el.textContent = pool[card[ci]].a; });
@@ -487,41 +493,43 @@ function playBingo(ctx) {
     });
   });
   ctx.root.replaceChildren(h("div", { class: "game" },
-    h("p", { class: "muted center small" }, "Rechne die Aufgabe am Beamer. Steht das Ergebnis auf deiner Karte, tippe es an."),
+    h("p", { class: "muted center small" }, t("bingo.howto")),
     soloBox, grid, h("div", { class: "center" }, bingoBtn), h("div", { class: "row center" }, soloBtn, newCard)));
 }
 
 /* Spielleitung am Beamer: zieht die Aufgaben in fester Reihenfolge (Samen) */
 function bingoLeader(root, cfg, onLeave) {
   const { calls } = bingoSetup(cfg);
-  let k = 0, auto = 0, autoTimer = null, showAll = false;
+  let k = 0, autoTimer = null, showAll = false;
   const nr = h("div", { class: "lead-nr" });
   const big = h("div", { class: "lead-prompt" });
   const list = h("ol", { class: "lead-list", hidden: true });
-  const prev = h("button", { class: "btn", type: "button" }, "‹ Zurück");
-  const next = h("button", { class: "btn primary xl", type: "button" }, "Nächste Aufgabe ›");
-  const autoSel = h("select", { class: "select", "aria-label": "Automatisch weiter" },
-    [0, 15, 20, 30, 45].map(v => h("option", { value: v }, v ? `automatisch alle ${v} s` : "von Hand weiter")));
-  const solBtn = h("button", { class: "btn ghost", type: "button" }, "Lösungen zeigen");
+  const prev = h("button", { class: "btn", type: "button" }, t("back"));
+  const next = h("button", { class: "btn primary xl", type: "button" }, t("bingo.next"));
+  const autoSel = h("select", { class: "select", "aria-label": t("bingo.auto.aria") },
+    [0, 15, 20, 30, 45].map(v => h("option", { value: v }, v ? t("bingo.auto.every", { n: v }) : t("bingo.auto.manual"))));
+  const solBtn = h("button", { class: "btn ghost", type: "button" }, t("bingo.solutions.show"));
   function render() {
-    if (k === 0) { nr.textContent = "Bingo"; big.textContent = "Alle bereit? Los geht's mit der ersten Aufgabe."; }
-    else { const it = calls[k - 1]; nr.textContent = `Aufgabe ${k} von ${calls.length}`; big.textContent = it.q + (it.expr ? " = ?" : ""); }
+    if (k === 0) { nr.textContent = t("g.bingo"); big.textContent = t("bingo.lead.ready"); }
+    else { const it = calls[k - 1]; nr.textContent = t("bingo.callOf", { n: k, m: calls.length }); big.textContent = it.q + (it.expr ? " = ?" : ""); }
     prev.disabled = k <= 1; next.disabled = k >= calls.length;
     list.replaceChildren(...calls.slice(0, k).map(it => h("li", null, statementText(it, it.a))));
   }
+  const step = () => { if (k < calls.length) { k++; sfx("tick"); render(); } };
   prev.addEventListener("click", () => { if (k > 1) { k--; render(); } });
-  next.addEventListener("click", () => { if (k < calls.length) { k++; render(); } });
+  next.addEventListener("click", step);
   autoSel.addEventListener("change", () => {
-    clearInterval(autoTimer); auto = Number(autoSel.value);
-    if (auto) autoTimer = setInterval(() => { if (k < calls.length) { k++; render(); } else clearInterval(autoTimer); }, auto * 1000);
+    clearInterval(autoTimer);
+    const auto = Number(autoSel.value);
+    if (auto) autoTimer = setInterval(() => { if (k < calls.length) step(); else clearInterval(autoTimer); }, auto * 1000);
   });
-  solBtn.addEventListener("click", () => { showAll = !showAll; list.hidden = !showAll; solBtn.textContent = showAll ? "Lösungen ausblenden" : "Lösungen zeigen"; });
+  solBtn.addEventListener("click", () => { showAll = !showAll; list.hidden = !showAll; solBtn.textContent = showAll ? t("bingo.solutions.hide") : t("bingo.solutions.show"); });
   onLeave(() => clearInterval(autoTimer));
   keepAwake(true); onLeave(() => keepAwake(false));
   render();
   root.replaceChildren(h("div", { class: "leader" }, nr, big,
     h("div", { class: "row center" }, prev, next), h("div", { class: "row center" }, autoSel, solBtn),
-    h("p", { class: "muted center small" }, "Ruft jemand „Bingo“, nennt die Person die aktuelle Aufgabennummer – die App auf ihrem Gerät prüft die Reihe."), list));
+    h("p", { class: "muted center small" }, t("bingo.lead.hint")), list));
 }
 
 /* =====================================================================
@@ -535,7 +543,7 @@ function makeFleet(r, lo, hi) {
     let ok = true;
     for (const len of FLEET) {
       let placedShip = null;
-      for (let t = 0; t < 200 && !placedShip; t++) {
+      for (let tr = 0; tr < 200 && !placedShip; tr++) {
         const horiz = r.chance(0.5);
         const x0 = r.int(lo, horiz ? hi - len + 1 : hi), y0 = r.int(lo, horiz ? hi : hi - len + 1);
         const pts = [...Array(len)].map((_, i) => horiz ? [x0 + i, y0] : [x0, y0 + i]);
@@ -560,11 +568,13 @@ function fleetShot(ships, x, y) {
   }
   return { hit: false };
 }
+function P(x, y) { return NOTE.pt(num(x), num(y)); }
+function fleetLeft(ships) { return ships.filter(z => z.hits.size < z.pts.length).length; }
 function coordBoard(lo, hi, opts) {
   const U = 30, pad = 26, n = hi - lo;
   const W = n * U + 2 * pad;
   const X = x => pad + (x - lo) * U, Y = y => pad + (hi - y) * U;
-  const svg = s("svg", { viewBox: `0 0 ${W} ${W}`, class: "board", role: "img", "aria-label": "Koordinatensystem" });
+  const svg = s("svg", { viewBox: `0 0 ${W} ${W}`, class: "board", role: "img", "aria-label": t("a11y.board") });
   const g = s("g", { class: "b-grid" });
   for (let i = lo; i <= hi; i++) g.append(s("line", { x1: X(i), y1: Y(lo), x2: X(i), y2: Y(hi) }), s("line", { x1: X(lo), y1: Y(i), x2: X(hi), y2: Y(i) }));
   svg.append(g);
@@ -612,17 +622,17 @@ function coordBoard(lo, hi, opts) {
     }
   };
 }
-function coordPicker(lo, hi, label, onFire, fireLabel = "Feuer!") {
+function coordPicker(lo, hi, label, onFire, fireLabel) {
   let x = lo < 0 ? 0 : lo, y = lo < 0 ? 0 : lo;
   const xv = h("output", { class: "cval" }), yv = h("output", { class: "cval" });
-  const step = (axis, d) => h("button", { class: "btn step", type: "button", "aria-label": `${axis} ${d > 0 ? "erhöhen" : "verringern"}`, onclick: () => {
+  const step = (axis, d) => h("button", { class: "btn step", type: "button", "aria-label": t(d > 0 ? "a11y.inc" : "a11y.dec", { axis }), onclick: () => {
     if (axis === "x") x = Math.max(lo, Math.min(hi, x + d)); else y = Math.max(lo, Math.min(hi, y + d));
     paint();
   } }, d > 0 ? "+" : MINUS);
   const view = h("div", { class: "cview" });
-  function paint() { xv.textContent = num(x); yv.textContent = num(y); view.textContent = `(${num(x)} | ${num(y)})`; }
+  function paint() { xv.textContent = num(x); yv.textContent = num(y); view.textContent = P(x, y); }
   paint();
-  const fire = h("button", { class: "btn primary", type: "button", onclick: () => onFire(x, y) }, fireLabel);
+  const fire = h("button", { class: "btn primary", type: "button", onclick: () => onFire(x, y) }, fireLabel || t("ships.fire"));
   return {
     el: h("div", { class: "picker" }, label ? h("div", { class: "picker-label" }, label) : null,
       h("div", { class: "prow" }, h("span", { class: "axl" }, "x"), step("x", -1), xv, step("x", 1)),
@@ -632,37 +642,39 @@ function coordPicker(lo, hi, label, onFire, fireLabel = "Feuer!") {
   };
 }
 function shotText(res) {
-  if (!res.hit) return { t: "Wasser", c: "miss" };
-  if (res.allSunk) return { t: "Versenkt – die ganze Flotte!", c: "sunk" };
-  if (res.sunk) return { t: `Versenkt! (Schiff mit ${res.len} Punkten)`, c: "sunk" };
-  return { t: "Treffer!", c: "hit" };
+  if (!res.hit) return { t: t("ships.miss"), c: "miss" };
+  if (res.allSunk) return { t: t("ships.allSunk"), c: "sunk" };
+  if (res.sunk) return { t: t("ships.sunk", { n: res.len }), c: "sunk" };
+  return { t: t("ships.hit"), c: "hit" };
 }
+function fleetHint() { return t("ships.fleet", { list: FLEET.join(", "), n: FLEET.length }); }
 function playSchiffe(ctx) {
   const mode = gameSetting(ctx.cfg, "b");
-  if (mode === 0) { schiffeLeader(ctx.root, ctx.cfg, ctx.onLeave, ctx.finish); return; }
+  if (mode === 0) { schiffeLeader(ctx.root, ctx.cfg, ctx.onLeave); return; }
   if (mode === 2) { schiffePartner(ctx); return; }
   /* allein gegen die App: eigene Flotte je Gerät, damit niemand abschreibt */
   const [lo, hi] = boardRange(ctx.cfg);
   const ships = makeFleet(deviceRng(), lo, hi);
   const shots = [];
   const board = coordBoard(lo, hi);
-  const msg = h("div", { class: "shotmsg", role: "status" }, "Stelle eine Koordinate ein und feuere.");
-  const cnt = pill("Schüsse: 0"), left = pill(`Schiffe: ${ships.length}`, "good");
+  const msg = h("div", { class: "shotmsg", role: "status" }, t("ships.solo.start"));
+  const cnt = pill(t("ships.shots", { n: 0 })), left = pill(t("ships.left", { n: ships.length }), "good");
   const picker = coordPicker(lo, hi, null, (x, y) => {
     board.select(x, y);
-    if (shots.some(p => p.x === x && p.y === y)) { msg.textContent = `Auf (${num(x)} | ${num(y)}) hast du schon geschossen.`; msg.className = "shotmsg"; return; }
+    if (shots.some(p => p.x === x && p.y === y)) { msg.textContent = t("ships.already", { p: P(x, y) }); msg.className = "shotmsg"; return; }
     const res = fleetShot(ships, x, y);
     shots.push({ x, y, hit: res.hit });
     const st = shotText(res);
-    msg.textContent = `(${num(x)} | ${num(y)}): ${st.t}`; msg.className = "shotmsg " + st.c;
-    cnt.textContent = "Schüsse: " + shots.length;
-    left.textContent = "Schiffe: " + ships.filter(z => z.hits.size < z.pts.length).length;
+    sfx(res.hit ? "ok" : "tick");
+    msg.textContent = `${P(x, y)}: ${st.t}`; msg.className = "shotmsg " + st.c;
+    cnt.textContent = t("ships.shots", { n: shots.length });
+    left.textContent = t("ships.left", { n: fleetLeft(ships) });
     board.draw(ships, shots, false);
-    if (res.allSunk) setTimeout(() => ctx.finish({ big: shots.length, unit: "Schüsse", lines: [`Flotte: ${FLEET.join(", ")} Punkte lang`], record: { key: "schiffe", value: shots.length, lower: true } }), 1200);
+    if (res.allSunk) setTimeout(() => ctx.finish({ big: shots.length, unit: t("res.ships.unit", { n: shots.length }), lines: [t("res.ships.fleet", { list: FLEET.join(", ") })], record: { key: "schiffe", value: shots.length, lower: true } }), 1200);
   });
   board.draw(ships, shots, false);
   ctx.root.replaceChildren(h("div", { class: "game" }, hud(cnt, left),
-    h("p", { class: "muted center small" }, `Versteckt: ${FLEET.length} Schiffe auf Gitterpunkten (${FLEET.join(", ")} Punkte lang), waagerecht oder senkrecht.`),
+    h("p", { class: "muted center small" }, fleetHint()),
     h("div", { class: "boardwrap" }, board.svg, h("div", { class: "side" }, msg, picker.el))));
 }
 function schiffePartner(ctx) {
@@ -670,44 +682,45 @@ function schiffePartner(ctx) {
   let ships = makeFleet(deviceRng(), lo, hi);
   const incoming = [], mine = [];
   const ownBoard = coordBoard(lo, hi), oppBoard = coordBoard(lo, hi);
-  const ownMsg = h("div", { class: "shotmsg", role: "status" }, "Dein Partner ruft eine Koordinate. Stelle sie ein und sag die Antwort.");
-  const reroll = h("button", { class: "btn ghost small", type: "button" }, "Flotte neu verteilen");
+  const ownMsg = h("div", { class: "shotmsg", role: "status" }, t("ships.p.ownStart"));
+  const reroll = h("button", { class: "btn ghost small", type: "button" }, t("ships.p.reroll"));
   reroll.addEventListener("click", () => { ships = makeFleet(deviceRng(), lo, hi); ownBoard.draw(ships, incoming, true); });
-  const ownPicker = coordPicker(lo, hi, "Partner ruft:", (x, y) => {
+  const ownPicker = coordPicker(lo, hi, t("ships.p.calls"), (x, y) => {
     ownBoard.select(x, y);
-    if (incoming.some(p => p.x === x && p.y === y)) { ownMsg.textContent = `(${num(x)} | ${num(y)}) wurde schon gerufen.`; ownMsg.className = "shotmsg"; return; }
+    if (incoming.some(p => p.x === x && p.y === y)) { ownMsg.textContent = t("ships.p.calledBefore", { p: P(x, y) }); ownMsg.className = "shotmsg"; return; }
     const res = fleetShot(ships, x, y);
     incoming.push({ x, y, hit: res.hit });
     reroll.hidden = true;
     const st = shotText(res);
-    ownMsg.textContent = `Sag: „${st.t}“`; ownMsg.className = "shotmsg big " + st.c;
+    ownMsg.textContent = t("ships.p.say", { s: st.t }); ownMsg.className = "shotmsg big " + st.c;
     ownBoard.draw(ships, incoming, true);
-    if (res.allSunk) dialog("Flotte versenkt", "Alle deine Schiffe sind getroffen – dein Partner gewinnt diese Runde.", [{ label: "OK", primary: true }]);
-  }, "Eintragen");
+    if (res.allSunk) dialog(t("ships.p.lost.title"), t("ships.p.lost.text"), [{ label: t("ok"), primary: true }]);
+  }, t("ships.p.enter"));
   /* eigene Schüsse: Partner sagt Treffer oder Wasser, hier nur notieren */
   let sx = lo < 0 ? 0 : lo, sy = sx;
-  const oppMsg = h("div", { class: "shotmsg", role: "status" }, "Ruf deinem Partner eine Koordinate zu und trage seine Antwort ein.");
-  const oppPicker = coordPicker(lo, hi, "Ich rufe:", (x, y) => { sx = x; sy = y; oppBoard.select(x, y); oppMsg.textContent = `Ruf: „(${num(x)} | ${num(y)})“ – was antwortet dein Partner?`; }, "Auswählen");
+  const total = FLEET.reduce((a, b) => a + b, 0);
+  const oppMsg = h("div", { class: "shotmsg", role: "status" }, t("ships.p.oppStart"));
+  const oppPicker = coordPicker(lo, hi, t("ships.p.iCall"), (x, y) => { sx = x; sy = y; oppBoard.select(x, y); oppMsg.textContent = t("ships.p.callNow", { p: P(x, y) }); }, t("ships.p.choose"));
   const note = hit => {
     const i = mine.findIndex(p => p.x === sx && p.y === sy);
     if (i >= 0) mine.splice(i, 1);
     mine.push({ x: sx, y: sy, hit });
     oppBoard.draw([], mine, false);
-    oppMsg.textContent = `(${num(sx)} | ${num(sy)}): ${hit ? "Treffer" : "Wasser"} notiert. Treffer: ${mine.filter(p => p.hit).length} von ${FLEET.reduce((a, b) => a + b, 0)}`;
+    oppMsg.textContent = t("ships.p.noted", { p: P(sx, sy), s: hit ? t("ships.hitShort") : t("ships.miss"), n: mine.filter(p => p.hit).length, m: total });
   };
   const noteRow = h("div", { class: "row center" },
-    h("button", { class: "btn hitbtn", type: "button", onclick: () => note(true) }, "✕ Treffer"),
-    h("button", { class: "btn missbtn", type: "button", onclick: () => note(false) }, "○ Wasser"));
+    h("button", { class: "btn hitbtn", type: "button", onclick: () => note(true) }, "✕ " + t("ships.hitShort")),
+    h("button", { class: "btn missbtn", type: "button", onclick: () => note(false) }, "○ " + t("ships.miss")));
   ownBoard.draw(ships, incoming, true);
   oppBoard.draw([], mine, false);
-  const tabOwn = h("button", { class: "tab on", type: "button" }, "Meine Flotte");
-  const tabOpp = h("button", { class: "tab", type: "button" }, "Meine Schüsse");
+  const tabOwn = h("button", { class: "tab on", type: "button" }, t("ships.p.tabOwn"));
+  const tabOpp = h("button", { class: "tab", type: "button" }, t("ships.p.tabOpp"));
   const paneOwn = h("div", { class: "boardwrap" }, ownBoard.svg, h("div", { class: "side" }, ownMsg, ownPicker.el, reroll));
   const paneOpp = h("div", { class: "boardwrap", hidden: true }, oppBoard.svg, h("div", { class: "side" }, oppMsg, oppPicker.el, noteRow));
   tabOwn.addEventListener("click", () => { tabOwn.classList.add("on"); tabOpp.classList.remove("on"); paneOwn.hidden = false; paneOpp.hidden = true; });
   tabOpp.addEventListener("click", () => { tabOpp.classList.add("on"); tabOwn.classList.remove("on"); paneOpp.hidden = false; paneOwn.hidden = true; });
   ctx.root.replaceChildren(h("div", { class: "game" },
-    h("p", { class: "muted center small" }, "Abwechselnd rufen: Koordinate ansagen, der Partner trägt sie ein und antwortet „Treffer“, „Wasser“ oder „Versenkt“."),
+    h("p", { class: "muted center small" }, t("ships.p.howto")),
     h("div", { class: "tabs" }, tabOwn, tabOpp), paneOwn, paneOpp));
 }
 /* Klasse gegen Lehrkraft am Beamer */
@@ -717,43 +730,46 @@ function schiffeLeader(root, cfg, onLeave) {
   const shots = [];
   let reveal = false;
   const board = coordBoard(lo, hi, { onPick: (x, y) => { picker.set(x, y); board.select(x, y); } });
-  const msg = h("div", { class: "shotmsg big", role: "status" }, "Die Klasse ruft Koordinaten. Einstellen oder auf den Punkt tippen, dann feuern.");
-  const cnt = pill("Schüsse: 0"), left = pill(`Schiffe: ${FLEET.length}`, "good");
+  const msg = h("div", { class: "shotmsg big", role: "status" }, t("ships.lead.start"));
+  const cnt = pill(t("ships.shots", { n: 0 })), left = pill(t("ships.left", { n: FLEET.length }), "good");
   const picker = coordPicker(lo, hi, null, (x, y) => {
     board.select(x, y);
-    if (shots.some(p => p.x === x && p.y === y)) { msg.textContent = `(${num(x)} | ${num(y)}) wurde schon beschossen.`; msg.className = "shotmsg big"; return; }
+    if (shots.some(p => p.x === x && p.y === y)) { msg.textContent = t("ships.lead.already", { p: P(x, y) }); msg.className = "shotmsg big"; return; }
     const res = fleetShot(ships, x, y);
     shots.push({ x, y, hit: res.hit });
     const st = shotText(res);
-    msg.textContent = `(${num(x)} | ${num(y)}): ${st.t}`; msg.className = "shotmsg big " + st.c;
-    cnt.textContent = "Schüsse: " + shots.length;
-    left.textContent = "Schiffe: " + ships.filter(z => z.hits.size < z.pts.length).length;
+    sfx(res.allSunk ? "gong" : res.hit ? "ok" : "tick");
+    msg.textContent = `${P(x, y)}: ${st.t}`; msg.className = "shotmsg big " + st.c;
+    cnt.textContent = t("ships.shots", { n: shots.length });
+    left.textContent = t("ships.left", { n: fleetLeft(ships) });
     board.draw(ships, shots, reveal);
   });
-  const revealBtn = h("button", { class: "btn ghost small", type: "button" }, "Flotte aufdecken");
-  revealBtn.addEventListener("click", () => { reveal = !reveal; revealBtn.textContent = reveal ? "Flotte verbergen" : "Flotte aufdecken"; board.draw(ships, shots, reveal); });
-  const again = h("button", { class: "btn ghost small", type: "button" }, "Neue Runde");
-  again.addEventListener("click", () => confirmDialog("Neue Flotte verstecken und von vorn beginnen?", () => {
+  const revealBtn = h("button", { class: "btn ghost small", type: "button" }, t("ships.lead.reveal"));
+  revealBtn.addEventListener("click", () => { reveal = !reveal; revealBtn.textContent = reveal ? t("ships.lead.hide") : t("ships.lead.reveal"); board.draw(ships, shots, reveal); });
+  const again = h("button", { class: "btn ghost small", type: "button" }, t("ships.lead.again"));
+  again.addEventListener("click", () => confirmDialog(t("ships.lead.again.confirm"), () => {
     ships = makeFleet(deviceRng(), lo, hi); shots.length = 0; reveal = false;
-    revealBtn.textContent = "Flotte aufdecken"; cnt.textContent = "Schüsse: 0"; left.textContent = `Schiffe: ${FLEET.length}`;
-    msg.textContent = "Neue Flotte versteckt."; msg.className = "shotmsg big";
+    revealBtn.textContent = t("ships.lead.reveal"); cnt.textContent = t("ships.shots", { n: 0 }); left.textContent = t("ships.left", { n: FLEET.length });
+    msg.textContent = t("ships.lead.hidden"); msg.className = "shotmsg big";
     board.draw(ships, shots, false);
   }));
   board.draw(ships, shots, false);
   keepAwake(true); onLeave(() => keepAwake(false));
   root.replaceChildren(h("div", { class: "game leader-wide" }, hud(cnt, left),
     h("div", { class: "boardwrap" }, board.svg, h("div", { class: "side" }, msg, picker.el, h("div", { class: "row center" }, revealBtn, again))),
-    h("p", { class: "muted center small" }, `Versteckt: ${FLEET.length} Schiffe auf Gitterpunkten (${FLEET.join(", ")} Punkte lang), waagerecht oder senkrecht, ohne sich zu berühren.`)));
+    h("p", { class: "muted center small" }, fleetHint() + " " + t("ships.noTouch"))));
 }
 
 /* =====================================================================
    Stationen-Rallye mit Lösungswort
+   Die Wörter sind auf Deutsch und Englisch gleich, damit Lehrkraft und
+   Klasse dasselbe Lösungswort sehen, egal welche Sprache ein Gerät nutzt.
    ===================================================================== */
 const WORDS = {
-  5: ["PUNKT", "SUMME", "TERME", "ACHSE", "KREIS", "LINIE", "BASIS"],
-  6: ["GERADE", "FAKTOR", "WURZEL", "PRISMA", "VEKTOR", "RADIUS"],
-  8: ["QUADRATE", "DIVISION", "PARABELN", "VARIABLE", "DREIECKE"],
-  10: ["KOORDINATE", "DIAGONALEN", "HYPOTENUSE", "PARALLELEN"]
+  5: ["DELTA", "SIGMA", "GAMMA", "OMEGA", "MINUS", "THETA"],
+  6: ["RADIUS", "LAMBDA", "MATRIX"],
+  8: ["QUADRANT", "INTEGRAL", "VARIABLE", "DIVIDEND", "ADDITION"],
+  10: ["HYPOTENUSE", "SUBTRAHEND"]
 };
 function rallyeSetup(cfg) {
   const n = gameSetting(cfg);
@@ -762,11 +778,10 @@ function rallyeSetup(cfg) {
   const items = makeItems(cfg.t, makeRng(cfg.seed), n, { graph: true, mc: true });
   const stations = items.map((it, k) => {
     const opts = r.shuffle([it.a, ...it.wrong]);
-    const letters = opts.map(o => o === it.a ? word[k] : null);
     const pool = "ABDEFGHKLMNPRSTUZ".split("").filter(c => c !== word[k]);
     const rs = r.shuffle(pool);
     let p = 0;
-    return { it, opts, letters: letters.map(l => l || rs[p++]) };
+    return { it, opts, letters: opts.map(o => o === it.a ? word[k] : rs[p++]) };
   });
   return { n: stations.length, word: word.slice(0, stations.length), stations };
 }
@@ -775,67 +790,59 @@ function playRallye(ctx) {
   const key = `rallye.${ctx.cfg.seed}.${ctx.cfg.t}.${ctx.cfg.a}`;
   const got = store.get(key, []);
   const station = ctx.cfg.b;
+  const filled = () => got.filter(Boolean).length;
   const slots = () => h("div", { class: "slots" }, st.word.split("").map((_, k) =>
-    h("span", { class: "slot" + (got[k] ? " filled" : "") + (k + 1 === station ? " here" : ""), title: "Station " + (k + 1) }, got[k] || (k + 1))));
+    h("span", { class: "slot" + (got[k] ? " filled" : "") + (k + 1 === station ? " here" : ""), title: t("rallye.station", { n: k + 1 }) }, got[k] || (k + 1))));
   function overview(extra) {
-    const all = got.filter(Boolean).length === st.n;
+    const all = filled() === st.n;
     const box = h("div", { class: "center-stage" },
       h("div", { class: "big-icon", "aria-hidden": "true" }, "🏃"),
-      h("h2", null, "Stationen-Rallye"),
+      h("h2", null, t("g.rallye")),
       h("p", { class: "topic-line" }, TOPICS[ctx.cfg.t].name),
       extra || null,
       slots(),
-      h("p", { class: "muted" }, all ? "Alle Stationen geschafft! Ergibt dein Lösungswort Sinn?" : `${got.filter(Boolean).length} von ${st.n} Stationen. Scanne die nächste Stationskarte im Raum.`));
+      h("p", { class: "muted" }, all ? t("rallye.allDone") : t("rallye.progress", { n: filled(), m: st.n })));
     if (all) {
-      const check = h("button", { class: "btn primary", type: "button" }, "Lösungswort prüfen");
+      const check = h("button", { class: "btn primary", type: "button" }, t("rallye.check"));
       check.addEventListener("click", () => {
         const sl = box.querySelectorAll(".slot");
         let right = 0;
         st.word.split("").forEach((c, k) => { const ok = got[k] === c; if (ok) right++; sl[k].classList.add(ok ? "ok" : "no"); });
-        check.replaceWith(h("p", { class: "result-line" }, right === st.n ? `🎉 Richtig: ${st.word}` : `${right} von ${st.n} Buchstaben stimmen. Rot: dort war die Antwort falsch.`));
+        sfx(right === st.n ? "gong" : "bad");
+        check.replaceWith(h("p", { class: "result-line" }, right === st.n ? t("rallye.right", { w: st.word }) : t("rallye.partly", { n: right, m: st.n })));
       });
       box.append(check);
     }
-    box.append(h("button", { class: "btn primary", type: "button", onclick: () => openScanner() }, "📷 Nächste Station scannen"));
-    const reset = h("button", { class: "btn ghost small", type: "button" }, "Rallye neu beginnen");
-    reset.addEventListener("click", () => confirmDialog("Alle gesammelten Buchstaben dieser Rallye löschen?", () => { got.length = 0; store.set(key, []); overview(); }));
+    box.append(h("button", { class: "btn primary", type: "button", onclick: () => openScanner() }, t("rallye.scanNext")));
+    const reset = h("button", { class: "btn ghost small", type: "button" }, t("rallye.reset"));
+    reset.addEventListener("click", () => confirmDialog(t("rallye.reset.confirm"), () => { got.length = 0; store.set(key, []); overview(); }));
     box.append(reset);
     ctx.root.replaceChildren(box);
   }
   if (!station || station > st.n) { overview(); return; }
   const k = station - 1, s2 = st.stations[k];
-  if (got[k]) { overview(h("p", { class: "notice" }, `Station ${station} hast du schon erledigt (Buchstabe ${got[k]}).`)); return; }
+  if (got[k]) { overview(h("p", { class: "notice" }, t("rallye.done", { n: station, l: got[k] }))); return; }
   const opts = h("div", { class: "options" }, s2.opts.map((o, j) => h("button", { class: "opt", type: "button", onclick: () => {
     got[k] = s2.letters[j];
     store.set(key, got);
-    overview(h("p", { class: "notice ok" }, `Dein Buchstabe für Station ${station}: `, h("strong", { class: "letter" }, s2.letters[j])));
+    sfx("ok");
+    overview(h("p", { class: "notice ok" }, t("rallye.yourLetter", { n: station }) + " ", h("strong", { class: "letter" }, s2.letters[j])));
   } }, o)));
-  ctx.root.replaceChildren(h("div", { class: "game" }, hud(pill(`Station ${station} von ${st.n}`)), slots(),
-    h("div", { class: "prompt" + (s2.it.fn ? " is-graph" : "") }, promptFace(s2.it), s2.it.expr ? h("span", { class: "eq-tail" }, " = ?") : null),
-    h("p", { class: "muted center small" }, "Wähle deine Antwort. Ob sie stimmt, verrät erst das Lösungswort."), opts));
+  ctx.root.replaceChildren(h("div", { class: "game" }, hud(pill(t("rallye.stationOf", { n: station, m: st.n }))), slots(),
+    h("div", { class: "prompt" + (s2.it.fn ? " is-graph" : "") }, ...[promptFace(s2.it), promptTail(s2.it)].filter(Boolean)),
+    h("p", { class: "muted center small" }, t("rallye.howto")), opts));
 }
 
 /* =====================================================================
    Move & Brain – Bewegungspause am Beamer
    ===================================================================== */
-const MOVES = [
-  "10 Kniebeugen – oder 10-mal auf die Zehenspitzen",
-  "Schultern 8-mal langsam nach hinten kreisen",
-  "20 Sekunden auf der Stelle gehen",
-  "Arme nach oben strecken, dann locker ausschütteln",
-  "10-mal abwechselnd das rechte und linke Knie anheben",
-  "Auf einem Bein stehen – 15 Sekunden, dann wechseln",
-  "Drei tiefe Atemzüge: 4 ein, 4 halten, 6 aus",
-  "Seitliche Schritte: zwei nach rechts, zwei nach links",
-  "Mit dem rechten Ellbogen das linke Knie berühren – 8-mal je Seite",
-  "Finger-Gymnastik: Daumen nacheinander an alle Fingerspitzen tippen"
-];
 function playMove(ctx) {
   const minutes = gameSetting(ctx.cfg);
   let mode = gameSetting(ctx.cfg, "b");
   const pool = ctx.items(60, { needNum: mode === 1 });
   if (mode === 1 && pool.length < 6) mode = 0;
   const textPool = mode === 1 ? pool : ctx.items(60, {});
+  const moves = t("move.list");
   const r = makeRng(ctx.cfg.seed ^ 0x40E);
   let step = 0, phase = "ask", phaseEnd = 0, phaseLen = 0, end = 0, paused = 0, timer = null, cur = null;
   const total = minutes * 60;
@@ -844,41 +851,42 @@ function playMove(ctx) {
   const big = h("div", { class: "move-big" });
   const reveal = h("div", { class: "move-reveal" });
   const bar = h("div", { class: "timebar" }, h("div"));
-  const pauseBtn = h("button", { class: "btn", type: "button" }, "Pause");
-  const skipBtn = h("button", { class: "btn", type: "button" }, "Weiter ›");
-  const stopBtn = h("button", { class: "btn ghost", type: "button" }, "Beenden");
+  const pauseBtn = h("button", { class: "btn", type: "button" }, t("pause"));
+  const skipBtn = h("button", { class: "btn", type: "button" }, t("move.skip"));
+  const stopBtn = h("button", { class: "btn ghost", type: "button" }, t("move.stop"));
 
   function makeStep() {
     step++;
     const kind = mode === 2 ? (step % 2 ? "tf" : "move") : mode === 1 ? "cmp" : "tf";
-    if (kind === "move") return { kind, rule: "⚡ Bewegung", text: MOVES[(step / 2 - 1) % MOVES.length], len: 14, show: 0 };
+    if (kind === "move") return { kind, rule: "⚡ " + t("move.motion"), text: moves[(step / 2 - 1) % moves.length], len: 14, show: 0 };
     if (kind === "cmp") {
       let a, b;
-      for (let t = 0; t < 30; t++) { a = r.pick(pool); b = r.pick(pool); if (a !== b && a.num !== b.num) break; }
-      return { kind, rule: "Linker Arm hoch: links ist mehr · Rechter Arm hoch: rechts ist mehr", a, b, len: 12, show: 5 };
+      for (let tr = 0; tr < 30; tr++) { a = r.pick(pool); b = r.pick(pool); if (a !== b && a.num !== b.num) break; }
+      return { kind, rule: t("move.rule.cmp"), a, b, len: 12, show: 5 };
     }
     const it = r.pick(textPool);
     const truth = r.chance(0.5);
-    return { kind, rule: "Wahr ➜ aufstehen 🙋 · Falsch ➜ sitzen bleiben 🪑", it, truth, text: statementText(it, truth ? it.a : r.pick(it.wrong)), len: 10, show: 5 };
+    return { kind, rule: t("move.rule.tf"), it, truth, text: statementText(it, truth ? it.a : r.pick(it.wrong)), len: 10, show: 5 };
   }
   function showAsk() {
     cur = makeStep();
     phase = "ask"; phaseLen = cur.len; phaseEnd = Date.now() + cur.len * 1000;
-    nrEl.textContent = cur.kind === "move" ? "Bewegung" : "Impuls " + Math.ceil(step / (mode === 2 ? 2 : 1));
+    nrEl.textContent = cur.kind === "move" ? t("move.motion") : t("move.impulse", { n: Math.ceil(step / (mode === 2 ? 2 : 1)) });
     rule.textContent = cur.rule;
     reveal.replaceChildren(); reveal.className = "move-reveal";
-    if (cur.kind === "cmp") big.replaceChildren(h("div", { class: "cmp" }, h("div", { class: "cmp-side" }, h("small", null, "links"), cur.a.q), h("div", { class: "cmp-vs" }, "oder"), h("div", { class: "cmp-side" }, h("small", null, "rechts"), cur.b.q)));
+    if (cur.kind === "cmp") big.replaceChildren(h("div", { class: "cmp" }, h("div", { class: "cmp-side" }, h("small", null, t("move.left")), cur.a.q), h("div", { class: "cmp-vs" }, t("move.or")), h("div", { class: "cmp-side" }, h("small", null, t("move.right")), cur.b.q)));
     else big.replaceChildren(h("span", null, cur.text));
   }
   function showReveal() {
     phase = "show"; phaseLen = cur.show; phaseEnd = Date.now() + cur.show * 1000;
+    sfx("tick");
     if (cur.kind === "tf") {
       reveal.className = "move-reveal " + (cur.truth ? "yes" : "no");
-      reveal.replaceChildren(...[cur.truth ? "WAHR ✓" : "FALSCH ✗", cur.truth ? null : h("small", null, "richtig: " + statementText(cur.it, cur.it.a))].filter(Boolean));
+      reveal.replaceChildren(...[cur.truth ? t("move.true") : t("move.false"), cur.truth ? null : h("small", null, t("move.correct", { s: statementText(cur.it, cur.it.a) }))].filter(Boolean));
     } else if (cur.kind === "cmp") {
-      const left = cur.a.num > cur.b.num;
+      const leftMore = cur.a.num > cur.b.num;
       reveal.className = "move-reveal yes";
-      reveal.replaceChildren(`${left ? "Links" : "Rechts"} ist mehr`, h("small", null, `${cur.a.q} → ${cur.a.a}   ·   ${cur.b.q} → ${cur.b.a}`));
+      reveal.replaceChildren(leftMore ? t("move.leftMore") : t("move.rightMore"), h("small", null, `${cur.a.q} → ${cur.a.a}   ·   ${cur.b.q} → ${cur.b.a}`));
     }
   }
   function tick() {
@@ -895,22 +903,23 @@ function playMove(ctx) {
   function stop() {
     clearInterval(timer); timer = null;
     keepAwake(false);
-    ctx.finish({ big: "👏", unit: "Geschafft!", lines: ["Kurz durchatmen – und jetzt konzentriert weiterarbeiten."] });
+    sfx("gong");
+    ctx.finish({ big: "👏", unit: t("move.done"), lines: [t("move.done.text")] });
   }
   pauseBtn.addEventListener("click", () => {
-    if (!paused) { paused = Date.now(); pauseBtn.textContent = "Fortsetzen"; }
-    else { const d = Date.now() - paused; end += d; phaseEnd += d; paused = 0; pauseBtn.textContent = "Pause"; }
+    if (!paused) { paused = Date.now(); pauseBtn.textContent = t("resume"); }
+    else { const d = Date.now() - paused; end += d; phaseEnd += d; paused = 0; pauseBtn.textContent = t("pause"); }
   });
   skipBtn.addEventListener("click", () => { if (paused) return; if (phase === "ask" && cur.show) showReveal(); else showAsk(); });
   stopBtn.addEventListener("click", stop);
   ctx.onLeave(() => { clearInterval(timer); keepAwake(false); });
-  readyScreen(ctx, `${minutes} Minuten Bewegung mit Mathe. Am besten am Beamer zeigen – alle stehen auf und machen mit.`, () =>
-    countdownThen(ctx.root, "Alle bereit?", () => {
+  readyScreen(ctx, t("g.move.intro", { n: minutes }), () =>
+    countdownThen(ctx.root, t("move.ready"), () => {
       keepAwake(true);
       end = Date.now() + total * 1000;
       showAsk();
       ctx.root.replaceChildren(h("div", { class: "game leader-wide" }, hud(timeEl, nrEl), rule, bar, big, reveal, h("div", { class: "row center" }, pauseBtn, skipBtn, stopBtn)));
       tick();
       timer = setInterval(tick, 200);
-    }));
+    }, ctx.onLeave));
 }
