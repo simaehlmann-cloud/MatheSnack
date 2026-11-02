@@ -72,6 +72,7 @@ for (const wf of [".github/workflows/android.yml", ".github/workflows/ios.yml"])
   const y = R(wf);
   ok(y.includes(`APP_ID: ${appId}`), `${wf}: APP_ID ist nicht ${appId}`);
   ok(y.includes("cp -r www/. build/www/"), `${wf} kopiert www/ nicht in die App`);
+  ok(/mkdir -p platforms\n\s*cordova platform add/.test(y), `${wf}: vor „cordova platform add“ fehlt „mkdir -p platforms“ – sonst baut Cordova im Repo-Ordner statt in build/`);
 }
 ok(R(".github/workflows/ios.yml").includes(`LINK_HOST: ${linkHost}`), "ios.yml: LINK_HOST weicht ab");
 ok(/workflow_dispatch/.test(R(".github/workflows/ios.yml")) && /github.event_name == 'workflow_dispatch'/.test(R(".github/workflows/ios.yml")), "Upload nach App Store Connect nur bei „Run workflow“");

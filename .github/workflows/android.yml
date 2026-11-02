@@ -93,6 +93,10 @@ jobs:
           grep -o '<name>[^<]*</name>' build/config.xml | head -1
 
           cd build
+          # Ohne diesen Ordner sucht Cordova den Projektordner weiter oben und
+          # findet das Repo selbst (dort liegen ebenfalls config.xml und www/) –
+          # die Plattform landete dann außerhalb von build/.
+          mkdir -p platforms
           cordova platform add "android@${CORDOVA_ANDROID}"
           cordova plugin ls
           cordova clean android
