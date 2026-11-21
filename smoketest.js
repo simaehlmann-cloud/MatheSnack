@@ -182,6 +182,43 @@ function readQr(page, sel) {
   await page.waitForTimeout(150);
   ok(await page.evaluate(() => isPro()) && await page.isVisible("text=Lehrkraft-Paket ist freigeschaltet"), "„Käufe wiederherstellen“ in den Einstellungen");
 
+  /* ---------- Bewerten, Weiterempfehlen, Feedback (iOS-Hülle nachgebaut) ---------- */
+  ok(await page.getAttribute("#btnRate", "href") === "itms-apps://itunes.apple.com/app/id6829524866?action=write-review", "iOS: „Bewerten“ öffnet das Bewertungsfenster im App Store");
+  ok((await page.getAttribute("#btnMail", "href")).startsWith("mailto:smaehlmann.appdev@gmail.com?subject="), "„Feedback senden“ öffnet eine vorbereitete E-Mail");
+  await page.evaluate(() => { window.plugins = { socialsharing: { setIPadPopupCoordinates() {}, shareWithOptions(o, ok) { window.__shared = o; ok(); } } }; });
+  await page.click("#btnRecommend");
+  const shared = await page.evaluate(() => window.__shared);
+  ok(shared && shared.url === "https://apps.apple.com/app/id6829524866" && /MatheSnack/.test(shared.message), "iOS: „Weiterempfehlen“ teilt den App-Store-Link");
+  ok(!/google|android/i.test(await page.evaluate(() => document.body.innerText + [...document.querySelectorAll("a[href]")].map(a => a.href).join(" "))), "iOS: Einstellungen nennen keine andere Plattform");
+  for (const f of ["datenschutz", "datenschutz-en", "impressum", "impressum-en"]) {
+    await page.goto(ROOT + "/www/" + f + ".html");
+    ok(!/google play|android|play store/i.test(await page.evaluate(() => document.body.innerText)), `iOS: ${f} nennt keine andere Plattform`);
+  }
+  const pa = await ctx.newPage(); watch(pa);
+  await pa.addInitScript(FAKE_STORE.replace('platformId: "ios"', 'platformId: "android"'));
+  await pa.goto(APP); await pa.click(".gear");
+  ok(await pa.getAttribute("#btnRate", "href") === "market://details?id=de.mathesnack.app", "Android: „Bewerten“ öffnet den eigenen Store");
+  await pa.evaluate(() => screenPaywall());
+  ok(!(await pa.isVisible("text=Familienfreigabe")), "Android: kein Hinweis auf Familienfreigabe");
+  await pa.evaluate(() => { localStorage.setItem("mathesnack.lang", JSON.stringify("de")); });
+  await pa.goto(ROOT + "/www/lizenzen.html");
+  ok(await pa.isVisible("a.back") && /Apache License/.test(await pa.evaluate(() => document.body.innerText)) && /Nayuki/.test(await pa.evaluate(() => document.body.innerText)), "Lizenzen-Seite mit Zurück-Knopf und beiden Lizenzen");
+  await pa.close();
+
+  /* Ergebnis darf nach „‹ Start“ nicht mehr aufspringen */
+  await page.goto(APP);
+  const late = await page.evaluate(() => {
+    const gi = GAMES.findIndex(x => x.key === "memory"), orig = GAMES[gi].play;
+    let ctx = null;
+    GAMES[gi].play = c => { ctx = c; };
+    playGame({ g: gi, t: 0, a: 0, b: 0, seed: 99 });
+    GAMES[gi].play = orig;
+    goHome();
+    ctx.finish({ big: 1, unit: "", lines: [] });
+    return currentScreen.name;
+  });
+  ok(late === "home", "Nach „‹ Start“ bleibt die Startseite");
+
   /* ---------- Schülergerät-Modus ---------- */
   const p2 = await ctx.newPage(); watch(p2);
   await p2.goto(APP);
@@ -194,6 +231,7 @@ function readQr(page, sel) {
   await p2.click(".dlg-box .btn.primary");
   await p2.waitForTimeout(200);
   ok(!(await p2.isVisible("text=Käufe wiederherstellen")) && !(await p2.isVisible("text=Lehrkraft-Paket ansehen")) && await p2.isVisible("text=Schülergerät-Modus ausschalten"), "Schülergerät-Modus blendet Kauf aus");
+  ok(!(await p2.isVisible("#btnMail")) && !(await p2.isVisible("#btnRate")), "Schülergerät-Modus blendet Bewerten und Feedback aus");
   await p2.click("#btnBack");
   ok(await p2.locator(".hometile").count() === 3 && !(await p2.isVisible(".hometile.teach")), "Schülergerät-Modus blendet „Spiel für die Klasse“ aus");
   await p2.click(".gear");

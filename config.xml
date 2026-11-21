@@ -3,9 +3,9 @@
      Vor dem Anlegen in App Store Connect bzw. der Play Console bewusst festlegen.
      Aufbau wie bei Drawmory. -->
 <widget id="de.mathesnack.app"
-        version="0.2.0"
-        android-versionCode="200"
-        ios-CFBundleVersion="200"
+        version="0.2.2"
+        android-versionCode="202"
+        ios-CFBundleVersion="202"
         xmlns="http://www.w3.org/ns/widgets"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:cdv="http://cordova.apache.org/ns/1.0">
@@ -21,6 +21,9 @@
          www/ ist die App; docs/ ist nur die Hinweisseite auf GitHub Pages. -->
     <allow-intent href="mailto:*" />
     <allow-intent href="https://*/*" />
+    <!-- „Bewerten“ in den Einstellungen: iOS öffnet den App Store, Android den eigenen Store -->
+    <allow-intent href="itms-apps:*" />
+    <allow-intent href="market:*" />
 
     <preference name="DisallowOverscroll" value="true" />
     <preference name="Fullscreen" value="false" />
@@ -126,4 +129,7 @@
     <!-- Laufzeit-Erlaubnis für die Kamera unter Android (getUserMedia im
          WebView braucht sie; unter iOS fragt das System selbst). -->
     <plugin name="cordova-plugin-android-permissions" spec="^1.1.5" />
+    <!-- Bildschirm wach halten bei QR-Code, Spielleitung und Bewegungspause
+         (Wake Lock gibt es in iOS-Apps erst ab iOS 18.4). -->
+    <plugin name="cordova-plugin-insomnia" spec="^4.3.0" />
 </widget>

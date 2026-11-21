@@ -32,19 +32,22 @@ for (const s of scripts) {
 }
 ok(!/(src|href)="https?:\/\//.test(index), "index.html lädt nichts von fremden Servern");
 ok(/Content-Security-Policy/.test(index) && /mediastream:/.test(index), "CSP fehlt oder erlaubt den Kamera-Stream nicht");
-for (const f of ["icon-192.png", "datenschutz.html", "datenschutz-en.html", "impressum.html", "impressum-en.html", "js/jsqr-LICENSE.txt"]) ok(exists("www/" + f), `www/${f} fehlt`);
+for (const f of ["icon-192.png", "datenschutz.html", "datenschutz-en.html", "impressum.html", "impressum-en.html", "lizenzen.html", "lizenzen-en.html", "js/jsqr-LICENSE.txt"]) ok(exists("www/" + f), `www/${f} fehlt`);
 ok(!exists("www/sw.js") && !exists("www/manifest.json"), "Webfassung-Reste (sw.js/manifest.json) gehören nicht in die App");
 info(`${scripts.length} Skripte vorhanden, syntaktisch korrekt, richtige Reihenfolge`);
 
 /* ---------- Pages (docs/) ---------- */
 for (const f of ["index.html", "open/index.html", ".nojekyll", "icon-192.png", "js/jsqr-LICENSE.txt"]) ok(exists("docs/" + f), `docs/${f} fehlt`);
-for (const f of ["datenschutz.html", "datenschutz-en.html", "impressum.html", "impressum-en.html"]) {
-  ok(exists("docs/" + f) && R("docs/" + f) === R("www/" + f), `docs/${f} weicht von www/${f} ab – nach Änderungen kopieren: cp www/datenschutz*.html www/impressum*.html docs/`);
+for (const f of ["datenschutz.html", "datenschutz-en.html", "impressum.html", "impressum-en.html", "lizenzen.html", "lizenzen-en.html"]) {
+  ok(exists("docs/" + f) && R("docs/" + f) === R("www/" + f), `docs/${f} weicht von www/${f} ab – nach Änderungen kopieren: cp www/datenschutz*.html www/impressum*.html www/lizenzen*.html docs/`);
 }
 const openPage = R("docs/open/index.html");
 ok(!/<script src=/.test(openPage) && !/makeItems|GAMES/.test(openPage), "Die Hinweisseite darf keine Spiele enthalten (Spielen nur in der App)");
 ok(/mathesnack:\/\/open#s=/.test(openPage), "Hinweisseite bietet mathesnack://open#s=… nicht an");
-info("Pages-Seiten vollständig, Rechtstexte in App und Pages gleich");
+for (const f of ["datenschutz.html", "datenschutz-en.html", "impressum.html", "impressum-en.html", "lizenzen.html", "lizenzen-en.html"]) {
+  ok(!/google|android|play store/i.test(R("www/" + f)), `www/${f} nennt eine andere Plattform – Apple lehnt das ab (Richtlinie 2.3.10)`);
+}
+info("Pages-Seiten vollständig, Rechtstexte in App und Pages gleich, ohne fremde Plattformen");
 
 /* ---------- Versionen ---------- */
 const version = (core.match(/const APP_VERSION = "([^"]+)"/) || [])[1];
@@ -76,7 +79,7 @@ for (const wf of [".github/workflows/android.yml", ".github/workflows/ios.yml"])
 }
 ok(R(".github/workflows/ios.yml").includes(`LINK_HOST: ${linkHost}`), "ios.yml: LINK_HOST weicht ab");
 ok(/workflow_dispatch/.test(R(".github/workflows/ios.yml")) && /github.event_name == 'workflow_dispatch'/.test(R(".github/workflows/ios.yml")), "Upload nach App Store Connect nur bei „Run workflow“");
-for (const p of ["cordova-plugin-purchase", "cordova-plugin-x-socialsharing", "cordova-plugin-customurlscheme", "cordova-plugin-android-permissions", "mathesnack-links"]) ok(config.includes(`name="${p}"`), `config.xml: Plugin ${p} fehlt`);
+for (const p of ["cordova-plugin-purchase", "cordova-plugin-x-socialsharing", "cordova-plugin-customurlscheme", "cordova-plugin-android-permissions", "cordova-plugin-insomnia", "mathesnack-links"]) ok(config.includes(`name="${p}"`), `config.xml: Plugin ${p} fehlt`);
 ok(exists("cordova-plugins/mathesnack-links/plugin.xml") && exists("cordova-plugins/mathesnack-links/src/ios/MathesnackLinks.m"), "Plugin mathesnack-links unvollständig");
 ok(!/drawmory/i.test(R("cordova-plugins/mathesnack-links/src/ios/MathesnackLinks.m")), "Plugin enthält noch Drawmory-Bezeichner");
 for (const k of ["NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription", "ITSAppUsesNonExemptEncryption", "android.permission.CAMERA"]) ok(config.includes(k), `config.xml: ${k} fehlt`);

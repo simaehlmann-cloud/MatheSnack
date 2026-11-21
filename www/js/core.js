@@ -3,7 +3,7 @@
    Einstellungen, Zufallssamen). Kein Server, keine Konten, keine Analyse. */
 "use strict";
 
-const APP_VERSION = "0.2.0";
+const APP_VERSION = "0.2.2";
 
 /* Ziel der QR-Codes. Ist MatheSnack installiert, öffnet die Kamera den Link
    direkt in der App (iOS: Universal Link, Plugin mathesnack-links).
@@ -238,9 +238,18 @@ function sfx(kind) {
   } catch (e) { /* ohne Ton weiter */ }
 }
 
-/* Bildschirm wach halten (Beamer, Bewegungspause). Fehlt die Funktion, egal. */
-let wakeLock = null;
+/* Bildschirm wach halten (QR-Code, Spielleitung, Bewegungspause).
+   In der App über cordova-plugin-insomnia – die Browser-Funktion Wake Lock
+   gibt es in iOS-Apps erst ab iOS 18.4. Im Browser Wake Lock; das System
+   gibt sie beim App-Wechsel frei; app.js fordert sie beim Zurückkehren neu an. */
+let wakeLock = null, wantAwake = false;
 async function keepAwake(on) {
+  wantAwake = !!on;
+  const ins = window.plugins && window.plugins.insomnia;
+  if (ins) {
+    try { if (on) ins.keepAwake(); else ins.allowSleepAgain(); } catch (e) { /* egal */ }
+    return;
+  }
   try {
     if (on && "wakeLock" in navigator && !wakeLock) {
       wakeLock = await navigator.wakeLock.request("screen");

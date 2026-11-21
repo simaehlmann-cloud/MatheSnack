@@ -72,6 +72,7 @@ p.center{display:block}
 
 /* Knöpfe */
 .btn{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:11px 20px;font-weight:700;min-height:48px;box-shadow:var(--shadow);transition:transform .08s}
+a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit}
 .btn:active{transform:scale(.97)}
 .btn.primary{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
 .btn.ghost{background:transparent;box-shadow:none}
@@ -315,7 +316,8 @@ p.center{display:block}
 .present-topic{font-size:calc(clamp(20px,2.4vw,28px) * var(--beam));font-weight:700;color:var(--ink)}
 .present-set{color:var(--muted);font-size:18px;margin-top:4px}
 .present-steps{font-size:calc(18px * var(--beam));padding-left:22px}
-.present-code{font-family:var(--mono);font-size:calc(clamp(24px,3.2vw,40px) * var(--beam));font-weight:800;letter-spacing:2px;background:var(--card);border:2px dashed var(--line);border-radius:var(--r-sm);padding:10px 14px;display:inline-block}
+.present-code{font-family:var(--mono);font-size:calc(clamp(24px,3.2vw,40px) * var(--beam));font-weight:800;letter-spacing:2px;background:var(--card);border:2px dashed var(--line);border-radius:var(--r-sm);padding:10px 14px;display:inline-block;white-space:nowrap;max-width:100%}
+@media (max-width:420px){.present-code{font-size:calc(clamp(18px,5.6vw,24px) * var(--beam));letter-spacing:1px}}
 .present-btns{justify-content:center}
 
 /* Ergebnis */

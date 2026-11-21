@@ -8,7 +8,7 @@ als Bewegungspause mit Mathe.
 Reine App für iOS und Android (Cordova), Deutsch und Englisch – offline, ohne
 Server, ohne Konto, ohne Tracking. Aufbau und Workflows folgen Drawmory.
 
-Version 0.2.0 · versionCode 200 · iOS-Build 200
+Version 0.2.2 · versionCode 202 · iOS-Build 202
 
 ## Spiele
 
@@ -39,8 +39,9 @@ Funktionen (mit Graphen), Aufgabenbanken Klasse 7–10.
 Sprache (auch per Flaggen 🇩🇪/🇬🇧 auf der Startseite) · Dunkelmodus-Schalter und
 Farbschema · Schriftgröße am Beamer · Töne · Vibration · Lehrkraft-Paket mit
 „Käufe wiederherstellen“ · **Schülergerät-Modus** (blendet Lehrerbereich und
-Kauf aus, Ausschalten nur mit PIN) · Daten löschen · Datenschutz, Impressum,
-Lizenzen.
+Kauf aus, Ausschalten nur mit PIN) · Daten löschen · **Bewerten, Weiterempfehlen, Feedback senden** (je Plattform
+nur der eigene Store; im Schülergerät-Modus ausgeblendet) · Datenschutz,
+Impressum, Lizenzen.
 
 ## Wie das ohne Server geht
 

@@ -190,17 +190,67 @@ function screenSettings() {
       h("p", { class: "muted small" }, t("set.data.hint")),
       h("button", { class: "btn ghost", type: "button", onclick: clearLocalData }, t("set.data.clear"))));
 
+    if (!student) sections.push(h("section", { class: "card setcard" },
+      h("h3", null, t("set.support")),
+      h("p", { class: "muted small" }, t("set.support.hint")),
+      h("div", { class: "row" },
+        rateHref() ? h("a", { class: "btn primary", id: "btnRate", href: rateHref() }, t("set.rate")) : null,
+        storeUrl() ? h("button", { class: "btn", id: "btnRecommend", type: "button", onclick: recommendApp }, t("set.recommend")) : null,
+        h("a", { class: "btn ghost", id: "btnMail", href: feedbackHref() }, t("set.mail")))));
+
     sections.push(h("section", { class: "card setcard" },
       h("h3", null, t("set.about")),
       h("p", { class: "small" }, t("set.about.text")),
       h("p", { class: "small" },
         h("a", { href: legalUrl("datenschutz") }, t("legal.privacy")), " · ",
         h("a", { href: legalUrl("impressum") }, t("legal.imprint")), " · ",
-        h("a", { href: "js/jsqr-LICENSE.txt" }, t("legal.licenses"))),
+        h("a", { href: legalUrl("lizenzen") }, t("legal.licenses"))),
       h("p", { class: "muted small" }, t("set.version", { v: APP_VERSION }))));
 
     root.append(...sections);
   }, { title: t("settings.title"), name: "settings", redraw: screenSettings });
+}
+
+/* Bewerten, Weiterempfehlen, Feedback (wie bei Drawmory).
+   Bewusst nur Knöpfe in den Einstellungen und keine eigene Bewertungs-Abfrage:
+   Apple erlaubt dafür nur die System-Abfrage (Richtlinie 5.6.1).
+   Jede Fassung verweist nur auf ihren eigenen Store; die iOS-App nennt keine
+   andere Plattform (Richtlinie 2.3.10). Im Browser gibt es keinen Store-Knopf.
+   Im Schülergerät-Modus ist der ganze Abschnitt ausgeblendet. */
+const APP_STORE_ID = "6829524866";
+const PLAY_ID = "de.mathesnack.app";
+const FEEDBACK_MAIL = "smaehlmann.appdev@gmail.com";
+function storePlatform() { return (window.cordova && window.cordova.platformId) || ""; }
+function rateHref() {
+  const plat = storePlatform();
+  if (plat === "ios") return "itms-apps://itunes.apple.com/app/id" + APP_STORE_ID + "?action=write-review";
+  if (plat === "android") return "market://details?id=" + PLAY_ID;
+  return "";
+}
+function storeUrl() {
+  const plat = storePlatform();
+  if (plat === "ios") return "https://apps.apple.com/app/id" + APP_STORE_ID;
+  if (plat === "android") return "https://play.google.com/store/apps/details?id=" + PLAY_ID;
+  return "";
+}
+function feedbackHref() {
+  const plat = storePlatform() || "web";
+  const os = (navigator.userAgent.match(/Android [\d.]+|(?:iPhone|CPU) OS [\d_]+|iPad/) || [""])[0].replace(/_/g, ".");
+  const info = "MatheSnack " + APP_VERSION + " · " + plat + (os ? " · " + os : "") + " · " + LANG;
+  return "mailto:" + FEEDBACK_MAIL + "?subject=" + encodeURIComponent(t("mail.subject")) +
+    "&body=" + encodeURIComponent(t("mail.body", { info }));
+}
+function recommendApp() {
+  const url = storeUrl();
+  if (!url) return;
+  const sp = window.plugins && window.plugins.socialsharing;
+  if (sp) {
+    if (sp.setIPadPopupCoordinates) sp.setIPadPopupCoordinates(Math.round(innerWidth / 2) + "," + Math.round(innerHeight / 2) + ",1,1");
+    sp.shareWithOptions({ message: t("share.text"), subject: t("share.subject"), url },
+      () => {}, () => copyText(url, t("share.failed")));
+    return;
+  }
+  copyText(url, t("share.failed"));
 }
 
 /* Schülergerät-Modus: blendet Lehrerbereich und Kauf aus. Zurück nur mit PIN,
@@ -283,10 +333,13 @@ function screenEnterCode(prefill) {
 function playGame(cfg, opt = {}) {
   const g = GAMES[cfg.g];
   go(root => {
+    /* Verzögertes finish (Memory, Zuordnen, Schiffe) nach „‹ Start“ verwerfen */
+    let open = true;
+    onLeave(() => { open = false; });
     const ctx = {
       cfg, root,
       items: (n, o) => makeItems(cfg.t, makeRng(cfg.seed), n, o),
-      finish: res => screenResult(cfg, res),
+      finish: res => { if (open) screenResult(cfg, res); },
       onLeave
     };
     g.play(ctx);
@@ -444,6 +497,9 @@ if (window.matchMedia) {
   try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { applyStatusBar(); if (currentScreen.name === "settings") screenSettings(); }); } catch (e) { /* alt */ }
 }
 $("#btnBack").addEventListener("click", goHome);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && wantAwake) keepAwake(true);
+});
 document.addEventListener("backbutton", e => {
   e.preventDefault();
   if (!$("#dlg").hidden) { closeDialog(); return; }

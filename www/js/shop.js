@@ -147,7 +147,7 @@ function screenPaywall(reasonKey) {
         h("li", null, "✓ " + t("pro.fact.once")),
         h("li", null, "✓ " + t("pro.fact.students")),
         h("li", null, "✓ " + t("pro.fact.free")),
-        h("li", null, "✓ " + t("pro.fact.family"))),
+        onAndroid() ? null : h("li", null, "✓ " + t("pro.fact.family"))),
       h("div", { class: "actions" }, buy, restore),
       msg,
       h("p", { class: "muted small center" }, onAndroid() ? t("pro.fine.google") : t("pro.fine.apple")));

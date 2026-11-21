@@ -1,6 +1,6 @@
 # MatheSnack nach TestFlight bringen
 
-Stand: Version 0.2.0, iOS-Build 200. Der Weg folgt Drawmory.
+Stand: Version 0.2.2, iOS-Build 202. Der Weg folgt Drawmory.
 
 **Schon mit 0.1 in TestFlight?** Dann gilt nur der Abschnitt
 [Update auf 0.2](#update-auf-02-einmalig) – dort steht alles, was für
@@ -68,7 +68,7 @@ App Store Connect → MatheSnack → **Monetarisierung → In-App-Käufe** → *
 - Referenzname: `Lehrkraft-Paket`
 - Produkt-ID: **`de.mathesnack.app.lehrkraft`** – exakt so, sie steht in der App fest
 - Preis: **4,99 €**, Verfügbarkeit: alle Länder
-- **Familienfreigabe**: einschalten (die App wirbt damit)
+- **Familienfreigabe**: einschalten (die App wirbt unter iOS damit; lässt sich später nicht mehr ausschalten)
 - Lokalisierung Deutsch: Anzeigename `Lehrkraft-Paket`,
   Beschreibung `Alle Spiele für die ganze Klasse freischalten` (Apple erlaubt
   höchstens 30 bzw. 45 Zeichen)
@@ -97,14 +97,14 @@ Flaggen auf der Startseite umschalten.
 ### F. Build hochladen
 
 Repo → **Actions → Build MatheSnack (iOS) → Run workflow** (Branch `main`).
-Im Schritt **„Erzeugtes Projekt bestätigen“** stehen Kennung, Version 0.2.0,
-Build 200, Kamera- und Foto-Hinweis, URL-Schema `mathesnack://`, die Plugins
+Im Schritt **„Erzeugtes Projekt bestätigen“** stehen Kennung, Version 0.2.2,
+Build 202, Kamera- und Foto-Hinweis, URL-Schema `mathesnack://`, die Plugins
 für Kauf, Teilen und Links, StoreKit, Associated Domains und das
 Privacy-Manifest.
 
 ### G. Testen in TestFlight
 
-1. **MatheSnack löschen** und Build 200 neu installieren (nur bei der
+1. **MatheSnack löschen** und Build 202 neu installieren (nur bei der
    Installation holt iOS die Link-Freigabe ab).
 2. **Sprache:** Flaggen 🇩🇪/🇬🇧 oben auf der Startseite.
 3. **Dunkelmodus:** ⚙️ → Darstellung → Schalter „Dunkelmodus“.
@@ -176,3 +176,10 @@ Vor jedem weiteren Upload `ios-CFBundleVersion` in der `config.xml` anheben
 > (gear icon) → "View Teacher Pack", including "Restore purchases". The camera
 > is used only to read QR codes on-device. The app is available in German
 > and English (flags on the home screen).
+
+## Hinweisseite und Store-Links
+
+In `docs/open/index.html` ist die App-Store-Adresse schon eingetragen
+(`https://apps.apple.com/app/id6829524866`). Bis zur Freigabe zeigt Apple
+dort „nicht verfügbar“. Für Google Play nach der Veröffentlichung `PLAY_URL`
+eintragen (`https://play.google.com/store/apps/details?id=de.mathesnack.app`).
