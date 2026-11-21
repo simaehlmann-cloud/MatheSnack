@@ -176,7 +176,7 @@ jobs:
 
           # Lehrkraft-Paket: Ohne das Kauf-Plugin gäbe es in TestFlight keinen
           # Kaufknopf mit Preis, sondern dauerhaft „Preis wird geladen“.
-          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing mathesnack-links; do
+          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing cordova-plugin-insomnia mathesnack-links; do
             cordova plugin ls | grep -q "^$P" && echo "Plugin $P installiert" || { echo "::error::Plugin $P fehlt."; FEHLER=1; }
           done
           if grep -q 'StoreKit.framework' "$PBX"; then

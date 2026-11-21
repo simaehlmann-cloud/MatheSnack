@@ -121,7 +121,7 @@ jobs:
           grep -q 'android.permission.CAMERA' platforms/android/app/src/main/AndroidManifest.xml \
             && echo "CAMERA im Manifest" \
             || { echo "::error::android.permission.CAMERA fehlt im Manifest (config.xml, config-file)."; FEHLER=1; }
-          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing cordova-plugin-customurlscheme; do
+          for P in cordova-plugin-purchase cordova-plugin-x-socialsharing cordova-plugin-customurlscheme cordova-plugin-insomnia; do
             cordova plugin ls | grep -q "^$P" && echo "Plugin $P installiert" || { echo "::error::Plugin $P fehlt."; FEHLER=1; }
           done
           # mathesnack://-Links (Knopf „In MatheSnack öffnen“ auf der Hinweisseite)
