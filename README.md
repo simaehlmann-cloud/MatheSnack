@@ -8,7 +8,7 @@ als Bewegungspause mit Mathe.
 Reine App für iOS und Android (Cordova), Deutsch und Englisch – offline, ohne
 Server, ohne Konto, ohne Tracking. Aufbau und Workflows folgen Drawmory.
 
-Version 0.2.2 · versionCode 202 · iOS-Build 202
+Version 1.0.0 · versionCode 10000 · iOS-Build 10000
 
 ## Spiele
 

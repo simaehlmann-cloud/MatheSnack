@@ -3,9 +3,9 @@
      Vor dem Anlegen in App Store Connect bzw. der Play Console bewusst festlegen.
      Aufbau wie bei Drawmory. -->
 <widget id="de.mathesnack.app"
-        version="0.2.2"
-        android-versionCode="202"
-        ios-CFBundleVersion="202"
+        version="1.0.0"
+        android-versionCode="10000"
+        ios-CFBundleVersion="10000"
         xmlns="http://www.w3.org/ns/widgets"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:cdv="http://cordova.apache.org/ns/1.0">

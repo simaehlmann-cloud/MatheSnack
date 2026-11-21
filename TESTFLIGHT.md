@@ -1,6 +1,6 @@
 # MatheSnack nach TestFlight bringen
 
-Stand: Version 0.2.2, iOS-Build 202. Der Weg folgt Drawmory.
+Stand: Version 1.0.0, iOS-Build 10000. Der Weg folgt Drawmory.
 
 **Schon mit 0.1 in TestFlight?** Dann gilt nur der Abschnitt
 [Update auf 0.2](#update-auf-02-einmalig) – dort steht alles, was für
@@ -97,14 +97,14 @@ Flaggen auf der Startseite umschalten.
 ### F. Build hochladen
 
 Repo → **Actions → Build MatheSnack (iOS) → Run workflow** (Branch `main`).
-Im Schritt **„Erzeugtes Projekt bestätigen“** stehen Kennung, Version 0.2.2,
-Build 202, Kamera- und Foto-Hinweis, URL-Schema `mathesnack://`, die Plugins
+Im Schritt **„Erzeugtes Projekt bestätigen“** stehen Kennung, Version 1.0.0,
+Build 10000, Kamera- und Foto-Hinweis, URL-Schema `mathesnack://`, die Plugins
 für Kauf, Teilen und Links, StoreKit, Associated Domains und das
 Privacy-Manifest.
 
 ### G. Testen in TestFlight
 
-1. **MatheSnack löschen** und Build 202 neu installieren (nur bei der
+1. **MatheSnack löschen** und Build 10000 neu installieren (nur bei der
    Installation holt iOS die Link-Freigabe ab).
 2. **Sprache:** Flaggen 🇩🇪/🇬🇧 oben auf der Startseite.
 3. **Dunkelmodus:** ⚙️ → Darstellung → Schalter „Dunkelmodus“.
@@ -183,3 +183,10 @@ In `docs/open/index.html` ist die App-Store-Adresse schon eingetragen
 (`https://apps.apple.com/app/id6829524866`). Bis zur Freigabe zeigt Apple
 dort „nicht verfügbar“. Für Google Play nach der Veröffentlichung `PLAY_URL`
 eintragen (`https://play.google.com/store/apps/details?id=de.mathesnack.app`).
+
+## Einreichung bei Apple
+
+Store-Texte (DE/EN) und Bildschirmfotos: [`STORE-TEXTE.md`](STORE-TEXTE.md),
+Bilder in `store-screenshots/`. Version in App Store Connect auf **1.0.0**
+stellen (muss genau zur App passen), Build 10000 wählen, Lehrkraft-Paket auf
+der Versionsseite unter „In-App-Käufe und Abonnements“ anhängen.

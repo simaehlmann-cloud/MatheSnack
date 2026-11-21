@@ -3,7 +3,7 @@
    Einstellungen, Zufallssamen). Kein Server, keine Konten, keine Analyse. */
 "use strict";
 
-const APP_VERSION = "0.2.2";
+const APP_VERSION = "1.0.0";
 
 /* Ziel der QR-Codes. Ist MatheSnack installiert, öffnet die Kamera den Link
    direkt in der App (iOS: Universal Link, Plugin mathesnack-links).
